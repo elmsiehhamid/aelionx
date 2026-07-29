@@ -171,7 +171,7 @@
         .match-title { font-size: 18px; font-weight: 700; display: flex; align-items: center; }
         .badge-edit { background: rgba(249, 115, 22, 0.1); color: #f97316; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 10px; border: 1px solid rgba(249, 115, 22, 0.3); }
         
-        .match-tags { display: flex; gap: 8px; margin-bottom: 20px; }
+        .match-tags { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
         .tag { background: rgba(255, 255, 255, 0.05); padding: 4px 10px; border-radius: 20px; font-size: 12px; color: var(--text-muted); }
         .tag.purple { background: rgba(139, 92, 246, 0.1); color: var(--primary); border: 1px solid rgba(139, 92, 246, 0.3); }
 
@@ -309,9 +309,77 @@
         .card-input { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 15px; }
         .card-input input { background: transparent; border: none; color: white; outline: none; width: 100%; font-family: 'Poppins'; }
 
+
+        /* ========================================================
+           --- RESPONSIVE DESIGN (MOBILES & TABLETTES) ---
+           ======================================================== */
+        @media (max-width: 992px) {
+            /* Sidebar en mode tiroir (cachée par défaut) */
+            .sidebar-overlay {
+                display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 40;
+            }
+            .sidebar-overlay.active { display: block; }
+            
+            .sidebar {
+                position: fixed; left: -300px; top: 0; height: 100vh;
+                transition: 0.3s ease-in-out; z-index: 50; box-shadow: 5px 0 20px rgba(0,0,0,0.5);
+            }
+            .sidebar.active { left: 0; }
+            
+            /* Bouton Hamburger dans la topbar */
+            .menu-toggle { display: block !important; background: transparent; border: none; color: white; font-size: 24px; cursor: pointer; margin-right: 15px; }
+            
+            /* Ajustement de la Topbar */
+            .topbar { padding: 0 15px; justify-content: space-between; }
+            .search-bar { display: none; } /* On cache la barre de recherche sur petit écran pour gagner de la place */
+            
+            .user-panel { gap: 10px; }
+            .btn-epic span { display: none; } /* On cache le texte "Link Epic", on garde juste l'icône */
+            .balance-badge { padding: 6px 10px; font-size: 12px; }
+            .fa-discord, .fa-bell { font-size: 16px !important; }
+            .avatar { width: 30px; height: 30px; }
+
+            /* Espacement général des sections */
+            .page-section { padding: 20px; height: calc(100vh - 70px); }
+
+            /* Textes de la page Matches */
+            .matches-hero h1 { font-size: 32px !important; }
+            .matches-hero h2 { font-size: 22px !important; }
+            .hero-stats { flex-wrap: wrap; justify-content: center; gap: 15px; }
+            .hero-stats div { font-size: 12px; }
+            
+            /* En-têtes et Filtres */
+            .section-header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .section-header h3 { font-size: 22px; }
+            .filters { flex-wrap: wrap; gap: 10px; }
+            .filter-btn { padding: 8px 12px; font-size: 12px; }
+            
+            /* Passage à 1 seule colonne pour les grilles sur mobile */
+            .matches-grid { grid-template-columns: 1fr; }
+            .shop-banners { grid-template-columns: 1fr; }
+            .chests-grid { grid-template-columns: 1fr; }
+            .gc-grid { grid-template-columns: 1fr; }
+            .avatar-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } /* 2 colonnes max pour les avatars */
+            
+            /* Ajustement des Onglets */
+            .page-tabs { flex-wrap: wrap; width: 100%; }
+            .page-tab { flex: 1; text-align: center; padding: 10px; font-size: 12px; }
+            
+            /* Rétrécissement du Podium */
+            .podium-container { transform: scale(0.70); transform-origin: top center; margin-top: 20px; height: 260px; }
+            
+            /* Ajustement des fenêtres Modales */
+            .modal-content { padding: 20px; width: 92%; max-width: 400px; }
+            .token-option { padding: 10px 15px; }
+            .token-option .left { font-size: 14px; }
+        }
     </style>
 </head>
 <body>
+
+    <!-- OVERLAY POUR LA SIDEBAR MOBILE -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -353,14 +421,23 @@
     <main class="main-wrapper">
         <!-- TOPBAR -->
         <nav class="topbar">
+            
+            <!-- BOUTON HAMBURGER POUR MOBILE -->
+            <button class="menu-toggle" style="display: none;" onclick="toggleSidebar()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
             <div class="search-bar">
                 <i class="fa-solid fa-magnifying-glass" style="color: #666;"></i>
                 <input type="text" placeholder="Search players...">
             </div>
 
+            <!-- Ajout d'un petit spacer pour pousser le menu utilisateur à droite si la recherche est masquée -->
+            <div style="flex: 1;" class="mobile-spacer"></div>
+
             <div class="user-panel">
                 <button class="btn-epic" onclick="openModal('modal-epic')">
-                    <i class="fa-solid fa-link"></i> Link Epic
+                    <i class="fa-solid fa-link"></i> <span>Link Epic</span>
                 </button>
                 <div class="balance-badge" onclick="openModal('modal-purchase')">
                     <span class="token-balance-display"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> <span class="token-balance-text">1.25</span></span> <i class="fa-solid fa-plus" style="font-size: 10px; margin-left: 5px; opacity: 0.5;"></i>
@@ -393,14 +470,16 @@
                     <div><i class="fa-regular fa-clock"></i> <span>34</span> Active Matches</div>
                 </div>
 
-                <div style="display: flex; justify-content: center; gap: 15px;">
+                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
                     <button class="btn-play-now" onclick="alert('Matchmaking is linking to Epic Games...')">Play Now</button>
                     <button class="btn-discord-join" onclick="window.open('https://discord.gg/G8KY6mnYr', '_blank')"><i class="fa-brands fa-discord"></i> Join Discord</button>
                 </div>
             </div>
 
-            <div class="section-header" style="justify-content: space-between; margin-bottom: 20px;">
-                <h3 style="font-size: 24px; font-weight: 700;">Live Matches</h3>
+            <div class="section-header">
+                <div>
+                    <h3 style="font-size: 24px; font-weight: 700;">Live Matches</h3>
+                </div>
                 <div style="display: flex; gap: 10px;">
                     <button class="filter-btn" style="background: transparent;" onclick="resetFilters()"><i class="fa-solid fa-rotate-right"></i> Reset</button>
                     <button class="btn-create-match">Create Match <span style="font-size: 10px; margin-left: 5px;">▼</span></button>
@@ -450,7 +529,7 @@
                 </div>
             </div>
 
-            <!-- MATCH CARDS AVEC ATTRIBUTS DE DONNÉES -->
+            <!-- MATCH CARDS -->
             <div class="matches-grid" id="matches-container">
                 
                 <!-- Card 1 -->
@@ -590,7 +669,7 @@
                 <div class="page-tab" onclick="switchLeaderboardTab(this)">Most Earned Teams</div>
             </div>
 
-            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 40px; margin-top: 20px;">
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 40px 20px; margin-top: 20px; overflow: hidden;">
                 <div class="podium-container" id="podium-area">
                     <div class="podium-step step-2">
                         <div class="podium-avatar">
@@ -630,13 +709,13 @@
                     </div>
                 </div>
 
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px; border-top: 1px solid var(--border-color); margin-top: -20px;">
-                    <div style="display: flex; align-items: center; gap: 20px;">
-                        <span style="font-size: 20px; font-weight: bold; width: 30px;">4</span>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px; border-top: 1px solid var(--border-color); margin-top: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span style="font-size: 20px; font-weight: bold; width: 20px;">4</span>
                         <img src="https://fortnite-api.com/images/cosmetics/br/cid_028_athena_commando_f/icon.png" style="width: 40px; height: 40px; border-radius: 50%;">
                         <span style="font-weight: bold; font-size: 16px;">crazy <i class="fa-brands fa-twitch" style="color: #a855f7;"></i></span>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 30px;">
+                    <div style="display: flex; align-items: center; gap: 20px;">
                         <div style="text-align: right;">
                             <span style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">EARNED</span>
                             <strong style="display: block; color: var(--success); font-size: 18px;">+35129.56</strong>
@@ -664,13 +743,13 @@
                 <div class="page-tab active" style="flex: 1; text-align: center;" onclick="clickShopTab(this, 'cosmetics')">Cosmetics</div>
                 <div class="page-tab" style="flex: 1; text-align: center;" onclick="clickShopTab(this, 'tokens')">Tokens</div>
                 <div class="page-tab" style="flex: 1; text-align: center;" onclick="clickShopTab(this, 'stickers')">Stickers</div>
-                <div class="page-tab" style="flex: 1; text-align: center;" onclick="clickShopTab(this, 'upgrades')">Match/Profile Upgrades</div>
+                <div class="page-tab" style="flex: 1; text-align: center;" onclick="clickShopTab(this, 'upgrades')">Match Upgrades</div>
             </div>
 
             <div class="shop-banners">
                 <div class="banner elite" onclick="promptPurchase('Elite Pass Season 1', 8.00)">
                     <div>
-                        <h4 style="font-size: 20px; color: var(--primary); display: flex; align-items: center; gap: 10px;">
+                        <h4 style="font-size: 20px; color: var(--primary); display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <i class="fa-solid fa-star"></i> Elite Pass <span style="background: rgba(139,92,246,0.2); font-size: 10px; padding: 2px 6px; border-radius: 4px;">SEASON 1</span>
                         </h4>
                         <p style="font-size: 13px; color: var(--text-muted); margin-top: 5px;">50 tiers of exclusive rewards, cosmetics and more!</p>
@@ -715,7 +794,7 @@
                 </div>
             </div>
 
-            <h4 style="margin-bottom: 20px; font-size: 20px; display: flex; align-items: center; gap: 15px;">
+            <h4 style="margin-bottom: 20px; font-size: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
                 Today's Avatars 
                 <span style="background: rgba(251, 191, 36, 0.1); color: var(--gold); border: 1px solid var(--gold); font-size: 12px; padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 8px; cursor: pointer;" onclick="promptPurchase('Avatars Chest', 5.00)">
                     <i class="fa-solid fa-gift"></i> Avatars Chest <i class="fa-solid fa-coins" style="margin-left: 5px;"></i> 5.00
@@ -760,9 +839,9 @@
                 </div>
             </div>
 
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
                 <h4 style="display: flex; align-items: center; gap: 10px; font-size: 20px;"><i class="fa-solid fa-sparkles" style="color: var(--gold);"></i> Newly Added</h4>
-                <div class="search-bar" style="width: 300px; background: rgba(0,0,0,0.3);">
+                <div class="search-bar" style="width: 100%; max-width: 300px; background: rgba(0,0,0,0.3); display: flex;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" placeholder="Search by name or platform...">
                 </div>
@@ -771,7 +850,7 @@
             <div class="gc-grid">
                 <div class="gc-card">
                     <div class="gc-top" style="background: #8b5cf6;">
-                        <span class="region">EU (ALL EU COUNTRIES)</span>
+                        <span class="region">EU (ALL)</span>
                         <h4>Uber</h4>
                         <span class="badge-new">NEW</span>
                         <i class="fa-brands fa-uber" style="position: absolute; bottom: -10px; right: 10px; font-size: 80px; color: rgba(255,255,255,0.1);"></i>
@@ -1002,6 +1081,12 @@
         let itemToBuyName = "";
         let itemToBuyPrice = 0;
 
+        // --- GESTION DU MENU MOBILE ---
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+        }
+
         // --- FILTRES & TRI ---
         let activeFilters = {
             region: 'all',
@@ -1010,14 +1095,12 @@
         };
 
         function toggleDropdown(dropdownId) {
-            // Ferme tous les autres dropdowns
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 if(menu.id !== dropdownId) menu.classList.remove('show');
             });
             document.getElementById(dropdownId).classList.toggle('show');
         }
 
-        // Fermer les menus si on clique ailleurs
         window.addEventListener('click', function(e) {
             if (!e.target.closest('.filter-dropdown')) {
                 document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
@@ -1027,16 +1110,12 @@
         function filterMatches(type, value, labelText) {
             activeFilters[type] = value;
             
-            // Met à jour le texte du bouton sélectionné
             if(type === 'region') document.getElementById('selected-region').innerText = labelText;
             if(type === 'platform') document.getElementById('selected-platform').innerText = labelText;
             if(type === 'gamemode') document.getElementById('selected-gamemode').innerText = labelText;
 
-            // Met en surbrillance l'item actif dans le menu
             event.target.parentElement.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('selected'));
             event.target.classList.add('selected');
-
-            // Ferme le dropdown
             event.target.parentElement.classList.remove('show');
 
             applyFilteringAndSorting();
@@ -1056,7 +1135,6 @@
             const container = document.getElementById('matches-container');
             let cards = Array.from(container.getElementsByClassName('match-card'));
 
-            // 1. Filtrage
             cards.forEach(card => {
                 let rMatch = (activeFilters.region === 'all' || card.dataset.region === activeFilters.region);
                 let pMatch = (activeFilters.platform === 'all' || card.dataset.platform === activeFilters.platform);
@@ -1069,7 +1147,6 @@
                 }
             });
 
-            // 2. Tri
             cards.sort((a, b) => {
                 if (sortType === 'newest') {
                     return parseInt(b.dataset.time) - parseInt(a.dataset.time);
@@ -1080,7 +1157,6 @@
                 }
             });
 
-            // Réorganise les cartes dans le DOM
             cards.forEach(card => container.appendChild(card));
         }
 
@@ -1111,6 +1187,12 @@
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
             if(element) element.classList.add('active');
+            
+            // Fermer le menu latéral sur mobile après un clic
+            if (window.innerWidth <= 992) {
+                document.querySelector('.sidebar').classList.remove('active');
+                document.querySelector('.sidebar-overlay').classList.remove('active');
+            }
         }
 
         function clickShopTab(element, tabName) {
