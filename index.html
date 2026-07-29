@@ -38,6 +38,12 @@
             overflow: hidden;
         }
 
+        /* --- CUSTOM SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-main); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
         /* --- ANIMATIONS "GAMING" --- */
         @keyframes float {
             0% { transform: translateY(0px); }
@@ -317,7 +323,7 @@
             background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 16px;
             width: 100%; max-width: 450px; padding: 30px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        .modal-close { position: absolute; top: 20px; right: 20px; color: var(--text-muted); cursor: pointer; font-size: 20px; transition: 0.2s; z-index: 10; }
+        .modal-close { position: absolute; top: 20px; right: 20px; color: var(--text-muted); cursor: pointer; font-size: 20px; transition: 0.2s; z-index: 10;}
         .modal-close:hover { color: white; }
 
         .token-list { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
@@ -436,9 +442,10 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
 
+            <!-- BARRE DE RECHERCHE FONCTIONNELLE -->
             <div class="search-bar">
                 <i class="fa-solid fa-magnifying-glass" style="color: #666;"></i>
-                <input type="text" placeholder="Search players...">
+                <input type="text" id="match-search-input" placeholder="Search matches (ex: 1v1)...">
             </div>
 
             <div style="flex: 1;" class="mobile-spacer"></div>
@@ -455,7 +462,6 @@
                 </div>
                 <i class="fa-brands fa-discord" style="font-size: 20px; color: #5865F2; cursor: pointer;" onclick="window.open('https://discord.gg/G8KY6mnYr', '_blank')"></i>
                 
-                <!-- NOUVEAU: Menu Notifications -->
                 <div style="position: relative;">
                     <i class="fa-solid fa-bell" style="font-size: 20px; color: var(--text-muted); cursor: pointer;" onclick="toggleNotifications()"></i>
                     <span style="position: absolute; top: -2px; right: -2px; background: var(--primary); width: 10px; height: 10px; border-radius: 50%;"></span>
@@ -480,8 +486,9 @@
         <div id="matches" class="page-section active">
             
             <div class="matches-hero">
-                <div class="online-badge">
-                    <i class="fa-solid fa-circle"></i> 342 Players Online
+                <!-- COMPTEUR LIVE -->
+                <div class="online-badge" id="live-player-badge">
+                    <i class="fa-solid fa-circle"></i> <span id="live-player-count">342</span> Players Online
                 </div>
                 
                 <h1 style="font-size: 48px; font-weight: 800; margin-bottom: 10px; letter-spacing: 1px;">ÆLIONX TOKENS</h1>
@@ -751,7 +758,6 @@
                 </div>
                 <div style="background: var(--bg-card); border: 1px solid var(--border-color); padding: 10px 20px; border-radius: 8px; text-align: center;">
                     <div style="font-size: 11px; color: var(--gold); font-weight: bold;">SHOP RESET</div>
-                    <!-- NOUVEAU: ID sur le timer -->
                     <div id="shop-timer" style="font-size: 20px; font-weight: bold; letter-spacing: 2px;">20 : 19 : 39</div>
                 </div>
             </div>
@@ -857,6 +863,7 @@
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
                 <h4 style="display: flex; align-items: center; gap: 10px; font-size: 20px;"><i class="fa-solid fa-sparkles" style="color: var(--gold);"></i> Newly Added</h4>
+                <!-- ON UTILISE LA MEME CLASSE MAIS SANS ID POUR NE PAS CONFLITER -->
                 <div class="search-bar" style="width: 100%; max-width: 300px; background: rgba(0,0,0,0.3); display: flex;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" placeholder="Search by name or platform...">
@@ -975,47 +982,24 @@
         </div>
     </div>
 
-    <!-- NOUVEAU: Modal Profil avec Historique -->
     <div id="modal-profile" class="modal-overlay">
-        <div class="modal-content" style="text-align: center; max-width: 400px; padding: 40px 25px;">
+        <div class="modal-content" style="text-align: center;">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-profile')"></i>
             <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 15px; object-fit: cover;">
             <h2 style="margin-bottom: 5px;" id="profile-name-display">Player Profile</h2>
             <p style="color: var(--primary); font-weight: bold; margin-bottom: 20px;">ÆLIONX MEMBER</p>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
-                <div style="background: var(--bg-sidebar); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
                     <div style="font-size: 12px; color: var(--text-muted);">Total Tokens</div>
                     <div style="font-size: 20px; font-weight: bold; color: var(--gold);"><i class="fa-solid fa-coins"></i> <span class="token-balance-text">1.25</span></div>
                 </div>
-                <div style="background: var(--bg-sidebar); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
                     <div style="font-size: 12px; color: var(--text-muted);">Matches Played</div>
                     <div style="font-size: 20px; font-weight: bold; color: white;">24</div>
                 </div>
             </div>
-
-            <!-- Ajout de l'historique ici -->
-            <div style="text-align: left; margin-top: 10px;">
-                <h4 style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Derniers Matchs</h4>
-                
-                <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <div>
-                        <strong style="color: white; font-size: 14px;">1V1 Realistic</strong><br>
-                        <span style="font-size: 11px; color: var(--text-muted);">vs Ash • Il y a 2 heures</span>
-                    </div>
-                    <div style="color: var(--danger); font-weight: bold; font-size: 14px;">- 5.00 <i class="fa-solid fa-coins"></i></div>
-                </div>
-
-                <div style="background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong style="color: white; font-size: 14px;">2V2 Zone Wars</strong><br>
-                        <span style="font-size: 11px; color: var(--text-muted);">vs Emill & wolvax • Hier</span>
-                    </div>
-                    <div style="color: var(--success); font-weight: bold; font-size: 14px;">+ 9.50 <i class="fa-solid fa-coins"></i></div>
-                </div>
-            </div>
-            
-            <button class="btn-full-gold" onclick="closeModal('modal-profile')" style="background: var(--bg-card); color: white; border: 1px solid var(--border-color); margin-top: 25px;">Close</button>
+            <button class="btn-full-gold" onclick="closeModal('modal-profile')" style="background: var(--bg-card); color: white; border: 1px solid var(--border-color);">Close</button>
         </div>
     </div>
 
@@ -1146,7 +1130,7 @@
         </div>
     </div>
 
-    <!-- MODALE DE SUCCÈS GLOBALE -->
+    <!-- NOUVELLE MODALE DE SUCCÈS GLOBALE -->
     <div id="modal-success-msg" class="modal-overlay">
         <div class="modal-content" style="text-align: center; max-width: 380px; padding: 40px 30px;">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-success-msg')"></i>
@@ -1166,7 +1150,7 @@
         </div>
     </div>
 
-    <!-- MODALE D'ERREUR GLOBALE -->
+    <!-- NOUVELLE MODALE D'ERREUR GLOBALE -->
     <div id="modal-error" class="modal-overlay">
         <div class="modal-content" style="text-align: center; max-width: 380px; padding: 40px 30px;">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-error')"></i>
@@ -1194,80 +1178,73 @@
         let itemToBuyName = "";
         let itemToBuyPrice = 0;
 
-        // --- GESTION DU LOCAL STORAGE & INITIALISATION ---
-        window.onload = async () => {
-            // Initialisation LocalStorage (Sauvegarde)
-            if (!localStorage.getItem('aelionx_balance')) localStorage.setItem('aelionx_balance', '10.00'); // Solde de départ pour tester
-            
-            // Récupère le solde
-            currentBalance = parseFloat(localStorage.getItem('aelionx_balance'));
-            updateAllBalances();
-
-            // Vérifie si le compte Epic a déjà été lié (simulation)
-            if (localStorage.getItem('aelionx_epic_linked') === 'true') {
-                let btnEpic = document.getElementById('btn-link-epic');
-                btnEpic.innerHTML = '<i class="fa-solid fa-check"></i> <span style="color: var(--success);">Epic Linked</span>';
-                btnEpic.style.borderColor = 'var(--success)';
-            }
-
-            // Démarrage du minuteur interactif
-            startShopTimer();
-
-            // Affichage de l'animation Skeleton avant chargement (Feedback visuel)
-            let container = document.getElementById('dynamic-matches-container');
-            container.innerHTML = `
-                <div class="match-card skeleton" style="height: 220px;"></div>
-                <div class="match-card skeleton" style="height: 220px;"></div>
-            `;
-            
-            // Simule un appel API
-            setTimeout(() => {
-                loadDynamicMatches();
-            }, 1500); 
-        };
-
-        // --- GESTION DES NOTIFICATIONS ---
-        function toggleNotifications() {
-            document.getElementById('notif-menu').classList.toggle('show');
-        }
-
-        // --- COMPTE A REBOURS SHOP ---
-        function startShopTimer() {
-            let timerDisplay = document.getElementById('shop-timer');
-            let timeParts = timerDisplay.innerText.split(' : ');
-            let hours = parseInt(timeParts[0]);
-            let minutes = parseInt(timeParts[1]);
-            let seconds = parseInt(timeParts[2]);
-            let totalSeconds = hours * 3600 + minutes * 60 + seconds;
-
-            setInterval(() => {
-                if (totalSeconds <= 0) return;
-                totalSeconds--;
-                let h = Math.floor(totalSeconds / 3600);
-                let m = Math.floor((totalSeconds % 3600) / 60);
-                let s = totalSeconds % 60;
-                timerDisplay.innerText = `${h.toString().padStart(2, '0')} : ${m.toString().padStart(2, '0')} : ${s.toString().padStart(2, '0')}`;
-            }, 1000);
-        }
-
-        // Fonction globale pour afficher les erreurs avec secousse
+        // Fonction globale pour afficher les erreurs joliment avec une croix
         function showError(message) {
             document.getElementById('error-message-text').innerText = message;
-            let modal = document.getElementById('modal-error');
-            let content = modal.querySelector('.modal-content');
-            
             openModal('modal-error');
-            
-            // Force l'animation shake
-            content.classList.remove('error-shake');
-            void content.offsetWidth; // Déclenche un reflow manuel
-            content.classList.add('error-shake');
         }
 
+        // Fonction globale pour afficher les succès joliment avec un check vert
         function showSuccess(message) {
             document.getElementById('success-message-text').innerText = message;
             openModal('modal-success-msg');
         }
+
+        // Chargement initial
+        window.onload = async () => {
+            // AJOUT PROPRE : Sauvegarde locale du solde pour éviter les remises à 0
+            if (localStorage.getItem('aelionx_balance')) {
+                currentBalance = parseFloat(localStorage.getItem('aelionx_balance'));
+            } else {
+                currentBalance = 10.00; // Solde de départ par défaut
+                localStorage.setItem('aelionx_balance', currentBalance);
+            }
+            updateAllBalances();
+
+            // Vérifie si on revient d'une connexion Epic réussie
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('epic_success') === 'true') {
+                showSuccess("Compte Epic Games connecté avec succès !");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            try {
+                let res = await fetch('/api/me');
+                let data = await res.json();
+                if (data.logged_in) {
+                    currentBalance = data.balance;
+                    updateAllBalances();
+                    if(document.getElementById('profile-name-display')) {
+                        document.getElementById('profile-name-display').innerText = data.username;
+                    }
+                }
+            } catch(e) {}
+            
+            loadDynamicMatches();
+
+            // AJOUT PROPRE : Animation aléatoire des joueurs en ligne
+            let basePlayers = 342;
+            let playerBadgeText = document.getElementById('live-player-count');
+            if(playerBadgeText) {
+                setInterval(() => {
+                    let fluctuation = Math.floor(Math.random() * 7) - 3; // -3 à +3
+                    basePlayers += fluctuation;
+                    playerBadgeText.innerText = basePlayers;
+                }, 5000);
+            }
+
+            // AJOUT PROPRE : Fonctionnement de la barre de recherche
+            let searchInput = document.getElementById('match-search-input');
+            if(searchInput) {
+                searchInput.addEventListener('input', function(e) {
+                    let term = e.target.value.toLowerCase();
+                    document.querySelectorAll('.match-card:not(.skeleton)').forEach(card => {
+                        let title = card.querySelector('.match-title').innerText.toLowerCase();
+                        card.style.display = title.includes(term) ? 'block' : 'none';
+                    });
+                });
+            }
+        };
 
         // --- GESTION DU MENU MOBILE ---
         function toggleSidebar() {
@@ -1311,27 +1288,39 @@
                 return;
             }
 
-            if (parseFloat(amountInput) > currentBalance) {
-                showError("Solde insuffisant pour effectuer ce retrait.");
-                return;
-            }
-
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
             btn.style.pointerEvents = "none";
 
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
-                currentBalance -= parseFloat(amountInput);
-                localStorage.setItem('aelionx_balance', currentBalance); // Sauvegarde
-                updateAllBalances();
+            try {
+                let response = await fetch('/api/withdraw', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: amountInput, email: emailInput })
+                });
+                let data = await response.json();
                 
-                setTimeout(() => {
-                    closeModal('modal-purchase');
+                if (response.ok && data.success) {
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
+                    currentBalance -= parseFloat(amountInput);
+                    localStorage.setItem('aelionx_balance', currentBalance); // AJOUT PROPRE
+                    updateAllBalances();
+                    setTimeout(() => {
+                        closeModal('modal-purchase');
+                        btn.innerHTML = 'REQUEST WITHDRAWAL';
+                        btn.style.pointerEvents = "auto";
+                        showSuccess(data.message);
+                    }, 1000);
+                } else {
                     btn.innerHTML = 'REQUEST WITHDRAWAL';
                     btn.style.pointerEvents = "auto";
-                    showSuccess(`Retrait de ${amountInput} Tokens envoyé vers ${emailInput}`);
-                }, 1000);
-            }, 1500);
+                    showError(data.error || "Impossible de traiter la demande.");
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                btn.innerHTML = 'REQUEST WITHDRAWAL';
+                btn.style.pointerEvents = "auto";
+                showError('Erreur de connexion au serveur.');
+            }
         }
 
         // --- FILTRES & TRI ---
@@ -1349,9 +1338,8 @@
         }
 
         window.addEventListener('click', function(e) {
-            if (!e.target.closest('.filter-dropdown') && !e.target.closest('.fa-bell')) {
+            if (!e.target.closest('.filter-dropdown')) {
                 document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
-                document.querySelectorAll('.notif-dropdown').forEach(menu => menu.classList.remove('show'));
             }
         });
 
@@ -1485,9 +1473,8 @@
             setTimeout(() => {
                 if (currentBalance >= itemToBuyPrice) {
                     currentBalance -= itemToBuyPrice;
-                    localStorage.setItem('aelionx_balance', currentBalance); // Sauvegarde
+                    localStorage.setItem('aelionx_balance', currentBalance); // AJOUT PROPRE
                     updateAllBalances();
-                    
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
                     btn.style.background = "var(--success)";
                     setTimeout(() => {
@@ -1538,86 +1525,86 @@
             openModal('modal-purchase');
         }
 
-        // SIMULATION CONNECTION EPIC (Avec LocalStorage)
+        // Redirige directement vers la vraie route de connexion officielle Epic Games de ton app.py
         function linkEpicAccount() {
-            let btnEpic = document.getElementById('btn-link-epic');
-            
-            localStorage.setItem('aelionx_epic_linked', 'true'); // Sauvegarde
-            closeModal('modal-epic');
-            
-            btnEpic.innerHTML = '<i class="fa-solid fa-check"></i> <span style="color: var(--success);">Epic Linked</span>';
-            btnEpic.style.borderColor = 'var(--success)';
-            
-            showSuccess("Compte Epic Games lié avec succès !");
-            // Dans ta vraie version, remets : window.location.href = '/login/epic';
+            window.location.href = '/login/epic';
         }
 
         async function processPayment() {
             let btn = document.getElementById('btn-pay-final');
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Connexion à PayPal...';
             btn.style.opacity = "0.7";
             btn.style.pointerEvents = "none";
-            
-            // Simulation d'achat via Checkout
-            setTimeout(() => {
-                currentBalance += selectedTokenAmount;
-                localStorage.setItem('aelionx_balance', currentBalance); // Sauvegarde
-                updateAllBalances();
-                
-                closeModal('modal-checkout');
-                showSuccess(`Vous avez acheté ${selectedTokenAmount} Tokens avec succès !`);
-                
+            try {
+                let response = await fetch('/pay/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: selectedTokenPrice })
+                });
+                let data = await response.json();
+                if (data.payment_url) {
+                    window.location.href = data.payment_url;
+                } else {
+                    showError(data.error || 'Impossible de contacter PayPal');
+                    btn.innerHTML = `Payer avec PayPal <span id="btn-pay-price">$${selectedTokenPrice}</span>`;
+                    btn.style.opacity = "1";
+                    btn.style.pointerEvents = "auto";
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                showError('Erreur de connexion au serveur.');
                 btn.innerHTML = `Payer avec PayPal <span id="btn-pay-price">$${selectedTokenPrice}</span>`;
                 btn.style.opacity = "1";
                 btn.style.pointerEvents = "auto";
-            }, 1500);
+            }
         }
 
         async function loadDynamicMatches() {
-            let container = document.getElementById('dynamic-matches-container');
-            container.innerHTML = '';
-            
-            // Simulation de données reçues
-            let match = {
-                id: 99,
-                region: 'EU',
-                platform: 'pc',
-                gamemode: '1v1',
-                entry_fee: 1.50,
-                prize: 2.80
-            };
+            try {
+                let res = await fetch('/api/matches');
+                let data = await res.json();
+                let container = document.getElementById('dynamic-matches-container');
+                container.innerHTML = '';
+                
+                if (data.matches) {
+                    data.matches.forEach(m => {
+                        let card = document.createElement('div');
+                        card.className = 'match-card';
+                        card.dataset.region = m.region;
+                        card.dataset.platform = m.platform;
+                        card.dataset.gamemode = m.gamemode;
+                        card.dataset.fee = m.entry_fee;
+                        card.dataset.time = '10';
 
-            let card = document.createElement('div');
-            card.className = 'match-card';
-            card.dataset.region = match.region;
-            card.dataset.platform = match.platform;
-            card.dataset.gamemode = match.gamemode;
-            card.dataset.fee = match.entry_fee;
-            card.dataset.time = '10';
+                        let title = m.gamemode === '1v1' ? '1V1 REALISTIC' : '2V2 ZONE WARS';
 
-            card.innerHTML = `
-                <div class="match-header">
-                    <div class="match-title">1V1 REALISTIC <span class="badge-edit" style="background: rgba(139, 92, 246, 0.2); color: var(--primary); border-color: var(--primary);">CUSTOM MATCH</span></div>
-                    <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 20px; border-radius: 50%;">
-                </div>
-                <div class="match-tags">
-                    <span class="tag">${match.region}</span>
-                    <span class="tag purple">${match.platform.toUpperCase()}</span>
-                </div>
-                <div class="match-details">
-                    <div class="detail-box"><span>FIRST TO</span><strong><i class="fa-solid fa-flag" style="color: var(--gold);"></i> 5</strong></div>
-                    <div class="detail-box" style="text-align: right;"><span>STATUS</span><strong><i class="fa-solid fa-circle-notch fa-spin" style="color: var(--success);"></i> WAITING</strong></div>
-                </div>
-                <div class="match-finance">
-                    <div class="finance-box"><span>ENTRY FEE</span><strong><i class="fa-solid fa-coins" style="color: var(--gold);"></i> ${parseFloat(match.entry_fee).toFixed(2)}</strong></div>
-                    <i class="fa-solid fa-arrow-right" style="color: var(--border-color);"></i>
-                    <div class="finance-box prize" style="text-align: right;"><span>PRIZE</span><strong><i class="fa-solid fa-crown" style="color: var(--success);"></i> ${parseFloat(match.prize).toFixed(2)}</strong></div>
-                </div>
-                <button class="btn-join" onclick="joinDynamicMatch(${match.id}, ${match.entry_fee})">JOIN MATCH</button>
-            `;
-            container.appendChild(card);
-            
-            applyFilteringAndSorting('newest');
+                        card.innerHTML = `
+                            <div class="match-header">
+                                <div class="match-title">${title} <span class="badge-edit" style="background: rgba(139, 92, 246, 0.2); color: var(--primary); border-color: var(--primary);">CUSTOM MATCH</span></div>
+                                <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 20px; border-radius: 50%;">
+                            </div>
+                            <div class="match-tags">
+                                <span class="tag">${m.region}</span>
+                                <span class="tag purple">${m.platform.toUpperCase()}</span>
+                            </div>
+                            <div class="match-details">
+                                <div class="detail-box"><span>FIRST TO</span><strong><i class="fa-solid fa-flag" style="color: var(--gold);"></i> 5</strong></div>
+                                <div class="detail-box" style="text-align: right;"><span>STATUS</span><strong><i class="fa-solid fa-circle-notch fa-spin" style="color: var(--success);"></i> WAITING</strong></div>
+                            </div>
+                            <div class="match-finance">
+                                <div class="finance-box"><span>ENTRY FEE</span><strong><i class="fa-solid fa-coins" style="color: var(--gold);"></i> ${parseFloat(m.entry_fee).toFixed(2)}</strong></div>
+                                <i class="fa-solid fa-arrow-right" style="color: var(--border-color);"></i>
+                                <div class="finance-box prize" style="text-align: right;"><span>PRIZE</span><strong><i class="fa-solid fa-crown" style="color: var(--success);"></i> ${parseFloat(m.prize).toFixed(2)}</strong></div>
+                            </div>
+                            <button class="btn-join" onclick="joinDynamicMatch(${m.id}, ${m.entry_fee})">JOIN MATCH</button>
+                        `;
+                        container.appendChild(card);
+                    });
+                }
+                applyFilteringAndSorting('newest');
+            } catch (e) {
+                console.error("Erreur chargement matchs:", e);
+            }
         }
 
         async function submitCreateMatch() {
@@ -1629,17 +1616,27 @@
             if(!fee || fee <= 0) {
                 showError('Veuillez entrer une mise valide.'); return;
             }
-            if (fee > currentBalance) {
-                showError('Solde insuffisant pour créer ce match.'); return;
-            }
 
-            // Simulation Création
-            currentBalance -= fee;
-            localStorage.setItem('aelionx_balance', currentBalance); // Sauvegarde
-            updateAllBalances();
-            closeModal('modal-create-match');
-            loadDynamicMatches(); 
-            showSuccess("Match créé et Tokens déduits ! En attente d'un adversaire...");
+            try {
+                let res = await fetch('/api/matches/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ region, platform, gamemode, entry_fee: fee })
+                });
+                let data = await res.json();
+                if(data.success) {
+                    currentBalance = data.new_balance;
+                    localStorage.setItem('aelionx_balance', currentBalance); // AJOUT PROPRE
+                    updateAllBalances();
+                    closeModal('modal-create-match');
+                    loadDynamicMatches(); 
+                    showSuccess("Match créé et Tokens déduits ! En attente d'un adversaire...");
+                } else {
+                    showError(data.error || 'Impossible de créer le match');
+                }
+            } catch (e) {
+                showError('Erreur de connexion au serveur.');
+            }
         }
 
         function joinDynamicMatch(id, fee) {
@@ -1657,11 +1654,19 @@
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
             btn.style.pointerEvents = "none";
 
-            setTimeout(() => {
-                if (currentBalance >= fee) {
-                    currentBalance -= fee;
-                    localStorage.setItem('aelionx_balance', currentBalance); // Sauvegarde
+            try {
+                let res = await fetch('/api/matches/join', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ match_id: id })
+                });
+                let data = await res.json();
+                
+                if(data.success) {
+                    currentBalance = data.new_balance;
+                    localStorage.setItem('aelionx_balance', currentBalance); // AJOUT PROPRE
                     updateAllBalances();
+                    loadDynamicMatches(); 
                     
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
                     btn.style.background = "var(--success)";
@@ -1681,10 +1686,16 @@
                         btn.innerHTML = 'Purchase';
                         btn.style.background = "var(--primary)";
                         btn.style.pointerEvents = "auto";
-                        showError("Solde insuffisant pour rejoindre ce match.");
+                        showError(data.error || 'Impossible de rejoindre');
                     }, 1200);
                 }
-            }, 1000);
+            } catch(e) {
+                closeModal('modal-confirm');
+                btn.innerHTML = 'Purchase';
+                btn.style.background = "var(--primary)";
+                btn.style.pointerEvents = "auto";
+                showError('Erreur de connexion au serveur.');
+            }
         }
 
         window.onclick = function(event) {
