@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, session, jsonify, send_from_directory
 import sqlite3
 import requests
@@ -196,4 +197,5 @@ def cancel_payment():
 
 if __name__ == '__main__':
     init_db()
-    app.run(port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
