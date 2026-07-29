@@ -974,43 +974,62 @@
                 <i class="fa-solid fa-coins" style="color: var(--gold);"></i> <span class="token-balance-text">1.25</span>
             </div>
 
+            <!-- ONGLETS ACHAT / RETRAIT -->
             <div class="page-tabs" style="width: 100%; display: flex; margin-bottom: 20px; background: rgba(0,0,0,0.3); border: none;">
-                <div class="page-tab active" style="flex: 1; text-align: center; border: none; background: var(--bg-card);">Purchase</div>
-                <div class="page-tab" style="flex: 1; text-align: center; border: none; background: transparent;">Withdraw</div>
-                <div class="page-tab" style="flex: 1; text-align: center; border: none; background: transparent;">Tip</div>
-                <div class="page-tab" style="flex: 1; text-align: center; border: none; background: transparent;">Redeem</div>
+                <div id="tab-btn-purchase" class="page-tab active" style="flex: 1; text-align: center; border: none; background: var(--bg-card);" onclick="switchFinanceTab('purchase')">Purchase</div>
+                <div id="tab-btn-withdraw" class="page-tab" style="flex: 1; text-align: center; border: none; background: transparent;" onclick="switchFinanceTab('withdraw')">Withdraw</div>
             </div>
 
-            <div style="font-size: 12px; font-weight: bold; color: var(--text-main); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Referral Code</div>
-            <div class="modal-input-group">
-                <input type="text" placeholder="Enter code">
-                <button class="btn-apply">Apply</button>
+            <!-- SECTION: ACHAT DE TOKENS -->
+            <div id="section-purchase">
+                <div style="font-size: 12px; font-weight: bold; color: var(--text-main); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Referral Code</div>
+                <div class="modal-input-group">
+                    <input type="text" placeholder="Enter code">
+                    <button class="btn-apply">Apply</button>
+                </div>
+
+                <div class="token-list">
+                    <div class="token-option" onclick="selectToken(this, 5, '5.00')">
+                        <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 5 Tokens</div>
+                        <div class="price">$5.00</div>
+                    </div>
+                    <div class="token-option selected" onclick="selectToken(this, 10, '10.00')" style="border-color: var(--gold); background: rgba(251, 191, 36, 0.05);">
+                        <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 10 Tokens <span class="badge-popular">MOST POPULAR</span></div>
+                        <div class="price">$10.00</div>
+                    </div>
+                    <div class="token-option" onclick="selectToken(this, 20, '20.00')">
+                        <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 20 Tokens</div>
+                        <div class="price">$20.00</div>
+                    </div>
+                    <div class="token-option" onclick="selectToken(this, 50, '50.00')">
+                        <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 50 Tokens</div>
+                        <div class="price">$50.00</div>
+                    </div>
+                    <div class="token-option" onclick="selectToken(this, 100, '100.00')">
+                        <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 100 Tokens</div>
+                        <div class="price">$100.00</div>
+                    </div>
+                </div>
+
+                <button class="btn-full-gold" id="btn-buy-initial" onclick="openCheckout()">PURCHASE 10 TOKENS</button>
             </div>
 
-            <div class="token-list">
-                <div class="token-option" onclick="selectToken(this, 5, '5.00')">
-                    <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 5 Tokens</div>
-                    <div class="price">$5.00</div>
+            <!-- SECTION: RETRAIT D'ARGENT -->
+            <div id="section-withdraw" style="display: none;">
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Convert your Tokens into real money via PayPal. Minimum withdrawal is 5 Tokens (1 Token = $1.00).</p>
+                
+                <div style="font-size: 12px; font-weight: bold; color: var(--text-main); text-transform: uppercase; margin-bottom: 5px;">Tokens to Withdraw</div>
+                <div class="modal-input-group" style="margin-bottom: 15px;">
+                    <input type="number" id="withdraw-amount-input" placeholder="Min. 5" min="5" style="width: 100%;">
                 </div>
-                <div class="token-option selected" onclick="selectToken(this, 10, '10.00')" style="border-color: var(--gold); background: rgba(251, 191, 36, 0.05);">
-                    <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 10 Tokens <span class="badge-popular">MOST POPULAR</span></div>
-                    <div class="price">$10.00</div>
-                </div>
-                <div class="token-option" onclick="selectToken(this, 20, '20.00')">
-                    <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 20 Tokens</div>
-                    <div class="price">$20.00</div>
-                </div>
-                <div class="token-option" onclick="selectToken(this, 50, '50.00')">
-                    <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 50 Tokens</div>
-                    <div class="price">$50.00</div>
-                </div>
-                <div class="token-option" onclick="selectToken(this, 100, '100.00')">
-                    <div class="left"><i class="fa-solid fa-coins" style="color: var(--gold);"></i> 100 Tokens</div>
-                    <div class="price">$100.00</div>
-                </div>
-            </div>
 
-            <button class="btn-full-gold" id="btn-buy-initial" onclick="openCheckout()">PURCHASE 10 TOKENS</button>
+                <div style="font-size: 12px; font-weight: bold; color: var(--text-main); text-transform: uppercase; margin-bottom: 5px;">PayPal Email Address</div>
+                <div class="modal-input-group" style="margin-bottom: 20px;">
+                    <input type="email" id="withdraw-email-input" placeholder="email@example.com" style="width: 100%;">
+                </div>
+
+                <button class="btn-full-gold" id="btn-withdraw-action" onclick="submitWithdrawal()" style="background: var(--success); color: white;">REQUEST WITHDRAWAL</button>
+            </div>
         </div>
     </div>
 
@@ -1091,6 +1110,76 @@
         function toggleSidebar() {
             document.querySelector('.sidebar').classList.toggle('active');
             document.querySelector('.sidebar-overlay').classList.toggle('active');
+        }
+
+        // --- GESTION ACHAT / RETRAIT ---
+        function switchFinanceTab(tab) {
+            let btnPurchase = document.getElementById('tab-btn-purchase');
+            let btnWithdraw = document.getElementById('tab-btn-withdraw');
+            let secPurchase = document.getElementById('section-purchase');
+            let secWithdraw = document.getElementById('section-withdraw');
+
+            if(tab === 'purchase') {
+                btnPurchase.classList.add('active');
+                btnPurchase.style.background = 'var(--bg-card)';
+                btnWithdraw.classList.remove('active');
+                btnWithdraw.style.background = 'transparent';
+                
+                secPurchase.style.display = 'block';
+                secWithdraw.style.display = 'none';
+            } else if(tab === 'withdraw') {
+                btnWithdraw.classList.add('active');
+                btnWithdraw.style.background = 'var(--bg-card)';
+                btnPurchase.classList.remove('active');
+                btnPurchase.style.background = 'transparent';
+                
+                secPurchase.style.display = 'none';
+                secWithdraw.style.display = 'block';
+            }
+        }
+
+        async function submitWithdrawal() {
+            let amountInput = document.getElementById('withdraw-amount-input').value;
+            let emailInput = document.getElementById('withdraw-email-input').value;
+            let btn = document.getElementById('btn-withdraw-action');
+
+            if (!amountInput || !emailInput) {
+                alert("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
+            btn.style.pointerEvents = "none";
+
+            try {
+                let response = await fetch('/api/withdraw', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: amountInput, email: emailInput })
+                });
+                let data = await response.json();
+                
+                if (response.ok && data.success) {
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
+                    currentBalance -= parseFloat(amountInput);
+                    updateAllBalances();
+                    setTimeout(() => {
+                        alert(data.message);
+                        closeModal('modal-purchase');
+                        btn.innerHTML = 'REQUEST WITHDRAWAL';
+                        btn.style.pointerEvents = "auto";
+                    }, 1000);
+                } else {
+                    alert('Erreur : ' + (data.error || "Impossible de traiter la demande."));
+                    btn.innerHTML = 'REQUEST WITHDRAWAL';
+                    btn.style.pointerEvents = "auto";
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur réseau avec le serveur.');
+                btn.innerHTML = 'REQUEST WITHDRAWAL';
+                btn.style.pointerEvents = "auto";
+            }
         }
 
         // --- FILTRES & TRI ---

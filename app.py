@@ -25,8 +25,12 @@ PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com" # Remplace par https://api-
 def init_db():
     conn = sqlite3.connect('aelionx.db')
     c = conn.cursor()
+    # Table des utilisateurs
     c.execute('''CREATE TABLE IF NOT EXISTS users 
                  (user_id TEXT PRIMARY KEY, tokens REAL, elo INTEGER, wins INTEGER DEFAULT 0, losses INTEGER DEFAULT 0, epic_id TEXT)''')
+    # Table des demandes de retrait
+    c.execute('''CREATE TABLE IF NOT EXISTS withdrawals 
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, amount REAL, paypal_email TEXT, status TEXT DEFAULT 'PENDING')''')
     conn.commit()
     conn.close()
 
@@ -92,7 +96,6 @@ def callback():
 # --- 2. LIAISON EPIC GAMES ---
 @app.route('/link/epic', methods=['POST'])
 @app.route('/api/link/epic', methods=['POST'])
-@app.route('/link-epic', methods=['POST'])
 def link_epic():
     try:
         if 'user_id' not in session:
@@ -117,7 +120,45 @@ def link_epic():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# --- 3. PAIEMENT PAYPAL ---
+# --- 3. RETRAIT D'ARGENT (CASH OUT) ---
+@app.route('/api/withdraw', methods=['POST'])
+def withdraw():
+    try:
+        if 'user_id' not in session:
+            return jsonify({"error": "Vous devez être connecté à Discord pour retirer."}), 403
+
+        req_data = request.get_json(silent=True) or {}
+        amount = float(req_data.get('amount', 0))
+        paypal_email = req_data.get('email', '')
+
+        if amount < 5.0: # Minimum de retrait (5 tokens)
+            return jsonify({"error": "Le retrait minimum est de 5 Tokens."}), 400
+        if not paypal_email or "@" not in paypal_email:
+            return jsonify({"error": "Adresse e-mail PayPal invalide."}), 400
+
+        user_id = session['user_id']
+        user = get_user(user_id)
+        current_tokens = user[1]
+
+        if current_tokens < amount:
+            return jsonify({"error": "Fonds insuffisants sur votre compte."}), 400
+
+        # Déduire les tokens
+        add_tokens(user_id, -amount)
+
+        # Enregistrer la demande
+        conn = sqlite3.connect('aelionx.db')
+        c = conn.cursor()
+        c.execute("INSERT INTO withdrawals (user_id, amount, paypal_email) VALUES (?, ?, ?)", (user_id, amount, paypal_email))
+        conn.commit()
+        conn.close()
+
+        return jsonify({"success": True, "message": f"Demande de retrait de ${amount} envoyée ! L'administrateur va valider votre transfert."})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# --- 4. PAIEMENT PAYPAL ---
 def get_paypal_token():
     auth = base64.b64encode(f"{PAYPAL_CLIENT_ID}:{PAYPAL_SECRET}".encode()).decode()
     headers = {"Authorization": f"Basic {auth}", "Content-Type": "application/x-www-form-urlencoded"}
