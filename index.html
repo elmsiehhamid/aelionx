@@ -419,7 +419,7 @@
                     <span style="color: var(--primary);"><i class="fa-solid fa-gem"></i></span> 850
                 </div>
                 <i class="fa-brands fa-discord" style="font-size: 20px; color: #5865F2; cursor: pointer;" onclick="window.open('https://discord.gg/G8KY6mnYr', '_blank')"></i>
-                <i class="fa-solid fa-bell" style="font-size: 20px; color: var(--text-muted); cursor: pointer;" onclick="alert('No new notifications.')"></i>
+                <i class="fa-solid fa-bell" style="font-size: 20px; color: var(--text-muted); cursor: pointer;" onclick="showSuccess('Aucune nouvelle notification.')"></i>
                 <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" alt="Avatar" class="avatar" onclick="openModal('modal-profile')">
             </div>
         </nav>
@@ -443,7 +443,7 @@
                 </div>
 
                 <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                    <button class="btn-play-now" onclick="alert('Matchmaking is linking to Epic Games...')">Play Now</button>
+                    <button class="btn-play-now" onclick="showSuccess('Recherche de match en cours...')">Play Now</button>
                     <button class="btn-discord-join" onclick="window.open('https://discord.gg/G8KY6mnYr', '_blank')"><i class="fa-brands fa-discord"></i> Join Discord</button>
                 </div>
             </div>
@@ -1074,21 +1074,22 @@
         </div>
     </div>
 
-    <div id="modal-epic-success" class="modal-overlay">
+    <!-- NOUVELLE MODALE DE SUCCÈS GLOBALE -->
+    <div id="modal-success-msg" class="modal-overlay">
         <div class="modal-content" style="text-align: center; max-width: 380px; padding: 40px 30px;">
-            <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-epic-success')"></i>
+            <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-success-msg')"></i>
             
             <div style="width: 70px; height: 70px; background: rgba(16, 185, 129, 0.1); border: 2px solid var(--success); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
-                <i class="fa-solid fa-gamepad" style="font-size: 30px; color: var(--success);"></i>
+                <i class="fa-solid fa-check" style="font-size: 35px; color: var(--success);"></i>
             </div>
 
-            <h3 style="margin-bottom: 10px; font-size: 22px;">Connexion réussie !</h3>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">
-                Ton compte Epic Games <strong id="success-epic-name" style="color: white;"></strong> est désormais connecté à ÆLIONX.
+            <h3 style="margin-bottom: 10px; font-size: 22px;">Succès !</h3>
+            <p id="success-message-text" style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">
+                Opération réussie.
             </p>
 
-            <button class="btn-full-gold" onclick="closeModal('modal-epic-success'); closeModal('modal-epic');" style="background: var(--success); color: white; margin-top: 0;">
-                C'est parti !
+            <button class="btn-full-gold" onclick="closeModal('modal-success-msg')" style="background: var(--success); color: white; margin-top: 0;">
+                Continuer
             </button>
         </div>
     </div>
@@ -1121,10 +1122,16 @@
         let itemToBuyName = "";
         let itemToBuyPrice = 0;
 
-        // Fonction globale pour afficher les erreurs joliment
+        // Fonction globale pour afficher les erreurs joliment avec une croix
         function showError(message) {
             document.getElementById('error-message-text').innerText = message;
             openModal('modal-error');
+        }
+
+        // Fonction globale pour afficher les succès joliment avec un check vert
+        function showSuccess(message) {
+            document.getElementById('success-message-text').innerText = message;
+            openModal('modal-success-msg');
         }
 
         // Chargement initial
@@ -1201,21 +1208,21 @@
                     currentBalance -= parseFloat(amountInput);
                     updateAllBalances();
                     setTimeout(() => {
-                        alert(data.message);
                         closeModal('modal-purchase');
                         btn.innerHTML = 'REQUEST WITHDRAWAL';
                         btn.style.pointerEvents = "auto";
+                        showSuccess(data.message);
                     }, 1000);
                 } else {
-                    showError(data.error || "Impossible de traiter la demande.");
                     btn.innerHTML = 'REQUEST WITHDRAWAL';
                     btn.style.pointerEvents = "auto";
+                    showError(data.error || "Impossible de traiter la demande.");
                 }
             } catch (error) {
                 console.error('Erreur:', error);
-                showError('Erreur de connexion au serveur.');
                 btn.innerHTML = 'REQUEST WITHDRAWAL';
                 btn.style.pointerEvents = "auto";
+                showError('Erreur de connexion au serveur.');
             }
         }
 
@@ -1333,7 +1340,7 @@
             if(tabName === 'tokens') {
                 openModal('modal-purchase');
             } else if(tabName === 'stickers' || tabName === 'upgrades') {
-                alert('This section is coming soon! Stay tuned.');
+                showSuccess('Cette section arrive très bientôt ! Restez à l\'affût.');
             }
         }
 
@@ -1354,6 +1361,11 @@
             itemToBuyPrice = parseFloat(price);
             document.getElementById('confirm-item-name').innerText = itemName;
             document.getElementById('confirm-item-price').innerText = price.toFixed(2) + " Tokens";
+            
+            // On s'assure que le bouton exécute bien l'achat de boutique
+            let btn = document.getElementById('btn-confirm-buy');
+            btn.onclick = executePurchase;
+
             openModal('modal-confirm');
         }
 
@@ -1361,6 +1373,7 @@
             let btn = document.getElementById('btn-confirm-buy');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processing...';
             btn.style.pointerEvents = "none";
+            
             setTimeout(() => {
                 if (currentBalance >= itemToBuyPrice) {
                     currentBalance -= itemToBuyPrice;
@@ -1372,7 +1385,7 @@
                         btn.innerHTML = 'Purchase';
                         btn.style.background = "var(--primary)";
                         btn.style.pointerEvents = "auto";
-                        alert(`You successfully bought ${itemToBuyName}!`);
+                        showSuccess(`Vous avez acheté ${itemToBuyName} avec succès !`);
                     }, 1000);
                 } else {
                     btn.innerHTML = '<i class="fa-solid fa-xmark"></i> Insufficient Tokens';
@@ -1546,11 +1559,11 @@
                 });
                 let data = await res.json();
                 if(data.success) {
-                    alert("Match créé et Tokens déduits ! En attente d'un adversaire...");
                     currentBalance = data.new_balance;
                     updateAllBalances();
                     closeModal('modal-create-match');
                     loadDynamicMatches(); 
+                    showSuccess("Match créé et Tokens déduits ! En attente d'un adversaire...");
                 } else {
                     showError(data.error || 'Impossible de créer le match');
                 }
@@ -1559,26 +1572,63 @@
             }
         }
 
-        async function joinDynamicMatch(id, fee) {
-            if(confirm(`Voulez-vous vraiment rejoindre ce match pour ${fee} Tokens ?`)) {
-                try {
-                    let res = await fetch('/api/matches/join', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ match_id: id })
-                    });
-                    let data = await res.json();
-                    if(data.success) {
-                        alert('Match rejoint avec succès ! Redirection vers le serveur de jeu...');
-                        currentBalance = data.new_balance;
-                        updateAllBalances();
-                        loadDynamicMatches(); 
-                    } else {
+        function joinDynamicMatch(id, fee) {
+            // On utilise la fenêtre de confirmation pour rejoindre le match
+            document.getElementById('confirm-item-name').innerText = "Frais d'entrée au Match";
+            document.getElementById('confirm-item-price').innerText = parseFloat(fee).toFixed(2) + " Tokens";
+            
+            let btn = document.getElementById('btn-confirm-buy');
+            // On remplace temporairement l'action du bouton par "Rejoindre"
+            btn.onclick = function() { executeJoinMatch(id, fee); };
+            
+            openModal('modal-confirm');
+        }
+
+        async function executeJoinMatch(id, fee) {
+            let btn = document.getElementById('btn-confirm-buy');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
+            btn.style.pointerEvents = "none";
+
+            try {
+                let res = await fetch('/api/matches/join', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ match_id: id })
+                });
+                let data = await res.json();
+                
+                if(data.success) {
+                    currentBalance = data.new_balance;
+                    updateAllBalances();
+                    loadDynamicMatches(); 
+                    
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
+                    btn.style.background = "var(--success)";
+                    
+                    setTimeout(() => {
+                        closeModal('modal-confirm');
+                        btn.innerHTML = 'Purchase';
+                        btn.style.background = "var(--primary)";
+                        btn.style.pointerEvents = "auto";
+                        showSuccess("Match rejoint avec succès ! Préparez-vous à jouer...");
+                    }, 1000);
+                } else {
+                    btn.innerHTML = '<i class="fa-solid fa-xmark"></i> Erreur';
+                    btn.style.background = "var(--danger)";
+                    setTimeout(() => {
+                        closeModal('modal-confirm');
+                        btn.innerHTML = 'Purchase';
+                        btn.style.background = "var(--primary)";
+                        btn.style.pointerEvents = "auto";
                         showError(data.error || 'Impossible de rejoindre');
-                    }
-                } catch(e) {
-                    showError('Erreur de connexion au serveur.');
+                    }, 1200);
                 }
+            } catch(e) {
+                closeModal('modal-confirm');
+                btn.innerHTML = 'Purchase';
+                btn.style.background = "var(--primary)";
+                btn.style.pointerEvents = "auto";
+                showError('Erreur de connexion au serveur.');
             }
         }
 
