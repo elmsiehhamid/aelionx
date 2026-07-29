@@ -187,6 +187,9 @@
         .btn-join { width: 100%; background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Poppins'; }
         .btn-join:hover { background: rgba(139, 92, 246, 0.1); box-shadow: 0 0 15px var(--primary-glow); }
 
+        /* BOUTON MATCH OCCUPÉ (ROUGE, INACTIF) */
+        .btn-join.occupied { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); opacity: 0.8; cursor: not-allowed; }
+        .btn-join.occupied:hover { box-shadow: none; background: rgba(239, 68, 68, 0.1); }
 
         /* --- LEADERBOARD PODIUM --- */
         .podium-container { display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin-top: 50px; margin-bottom: 50px; height: 350px; transition: 0.3s; }
@@ -488,7 +491,8 @@
                 </div>
                 <div style="display: flex; gap: 10px;">
                     <button class="filter-btn" style="background: transparent;" onclick="resetFilters()"><i class="fa-solid fa-rotate-right"></i> Reset</button>
-                    <button class="btn-create-match">Create Match <span style="font-size: 10px; margin-left: 5px;">▼</span></button>
+                    <!-- BOUTON CRÉER UN MATCH -->
+                    <button class="btn-create-match" onclick="openModal('modal-create-match')">Create Match <span style="font-size: 10px; margin-left: 5px;">▼</span></button>
                 </div>
             </div>
 
@@ -538,8 +542,11 @@
             <!-- MATCH CARDS -->
             <div class="matches-grid" id="matches-container">
                 
-                <!-- Card 1 -->
-                <div class="match-card" data-region="EU" data-platform="pc" data-gamemode="1v1" data-fee="0.50" data-time="3">
+                <!-- CONTENEUR POUR LES MATCHS DYNAMIQUES -->
+                <div id="dynamic-matches-container" style="display: contents;"></div>
+
+                <!-- Card 1 (OCCUPÉ) -->
+                <div class="match-card static-match" data-region="EU" data-platform="pc" data-gamemode="1v1" data-fee="0.50" data-time="3">
                     <div class="match-header">
                         <div class="match-title">1V1 REALISTIC <span class="badge-edit">NO SIMPLE EDIT</span></div>
                         <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 20px; border-radius: 50%;">
@@ -556,8 +563,8 @@
                             <strong><i class="fa-solid fa-flag" style="color: var(--gold);"></i> 5+2</strong>
                         </div>
                         <div class="detail-box" style="text-align: right;">
-                            <span>EXPIRES IN</span>
-                            <strong><i class="fa-regular fa-clock" style="color: var(--gold);"></i> 29:49</strong>
+                            <span>STATUS</span>
+                            <strong><i class="fa-solid fa-lock" style="color: var(--danger);"></i> PLAYING</strong>
                         </div>
                     </div>
 
@@ -573,11 +580,11 @@
                         </div>
                     </div>
 
-                    <button class="btn-join" onclick="promptPurchase('1V1 Match Entry', 0.50)">JOIN MATCH</button>
+                    <button class="btn-join occupied" disabled>MATCH OCCUPIED</button>
                 </div>
 
-                <!-- Card 2 -->
-                <div class="match-card" data-region="EU" data-platform="console" data-gamemode="2v2" data-fee="1.25" data-time="2">
+                <!-- Card 2 (OCCUPÉ) -->
+                <div class="match-card static-match" data-region="EU" data-platform="console" data-gamemode="2v2" data-fee="1.25" data-time="2">
                     <div class="match-header">
                         <div class="match-title">2V2 ZONE WARS</div>
                         <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 20px; border-radius: 50%;">
@@ -594,8 +601,8 @@
                             <strong><i class="fa-solid fa-flag" style="color: var(--gold);"></i> 7</strong>
                         </div>
                         <div class="detail-box" style="text-align: right;">
-                            <span>EXPIRES IN</span>
-                            <strong><i class="fa-regular fa-clock" style="color: var(--gold);"></i> 14:22</strong>
+                            <span>STATUS</span>
+                            <strong><i class="fa-solid fa-lock" style="color: var(--danger);"></i> PLAYING</strong>
                         </div>
                     </div>
 
@@ -611,11 +618,11 @@
                         </div>
                     </div>
 
-                    <button class="btn-join" onclick="promptPurchase('2V2 Match Entry', 1.25)">JOIN MATCH</button>
+                    <button class="btn-join occupied" disabled>MATCH OCCUPIED</button>
                 </div>
 
-                <!-- Card 3 -->
-                <div class="match-card" data-region="NAE" data-platform="pc" data-gamemode="1v1" data-fee="5.00" data-time="1">
+                <!-- Card 3 (OCCUPÉ) -->
+                <div class="match-card static-match" data-region="NAE" data-platform="pc" data-gamemode="1v1" data-fee="5.00" data-time="1">
                     <div class="match-header">
                         <div class="match-title">1V1 REALISTIC <span class="badge-edit">NO SIMPLE EDIT</span></div>
                         <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 20px; border-radius: 50%;">
@@ -632,8 +639,8 @@
                             <strong><i class="fa-solid fa-flag" style="color: var(--gold);"></i> 5+2</strong>
                         </div>
                         <div class="detail-box" style="text-align: right;">
-                            <span>EXPIRES IN</span>
-                            <strong><i class="fa-regular fa-clock" style="color: var(--gold);"></i> 05:10</strong>
+                            <span>STATUS</span>
+                            <strong><i class="fa-solid fa-lock" style="color: var(--danger);"></i> PLAYING</strong>
                         </div>
                     </div>
 
@@ -649,7 +656,7 @@
                         </div>
                     </div>
 
-                    <button class="btn-join" onclick="promptPurchase('High Stakes 1V1', 5.00)">JOIN MATCH</button>
+                    <button class="btn-join occupied" disabled>MATCH OCCUPIED</button>
                 </div>
 
             </div>
@@ -911,6 +918,45 @@
         </div>
 
     </main>
+
+    <!-- MODALE CRÉER UN MATCH -->
+    <div id="modal-create-match" class="modal-overlay">
+        <div class="modal-content" style="max-width: 400px;">
+            <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-create-match')"></i>
+            <h2 style="margin-bottom: 20px;">Create Match</h2>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 12px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;">Region</label>
+                <select id="create-region" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 12px; border-radius: 8px; font-family: 'Poppins'; outline: none; margin-top: 5px;">
+                    <option value="EU">EU</option>
+                    <option value="NAE">NAE</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 12px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;">Platform</label>
+                <select id="create-platform" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 12px; border-radius: 8px; font-family: 'Poppins'; outline: none; margin-top: 5px;">
+                    <option value="pc">PC</option>
+                    <option value="console">Console</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="font-size: 12px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;">Gamemode</label>
+                <select id="create-gamemode" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 12px; border-radius: 8px; font-family: 'Poppins'; outline: none; margin-top: 5px;">
+                    <option value="1v1">1V1 Realistic</option>
+                    <option value="2v2">2V2 Zone Wars</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 12px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;">Entry Fee (Tokens)</label>
+                <input type="number" id="create-fee" min="0.5" step="0.5" placeholder="ex: 2.0" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); color: white; padding: 12px; border-radius: 8px; font-family: 'Poppins'; outline: none; margin-top: 5px;">
+            </div>
+
+            <button class="btn-full-gold" onclick="submitCreateMatch()" style="margin-top: 0; background: var(--primary); color: white;">Confirm Creation</button>
+        </div>
+    </div>
 
     <!-- MODALES -->
     <div id="modal-confirm" class="modal-overlay">
@@ -1431,6 +1477,121 @@
                 btn.innerHTML = `Payer avec PayPal <span id="btn-pay-price">$${selectedTokenPrice}</span>`;
                 btn.style.opacity = "1";
                 btn.style.pointerEvents = "auto";
+            }
+        }
+
+        // --- NOUVEAUX SCRIPTS : CHARGEMENT, CRÉATION ET REJOINDRE DES MATCHS DYNAMIQUES ---
+        window.onload = async () => {
+            try {
+                let res = await fetch('/api/me');
+                let data = await res.json();
+                if (data.logged_in) {
+                    currentBalance = data.balance;
+                    updateAllBalances();
+                }
+            } catch(e) {}
+            loadDynamicMatches();
+        };
+
+        async function loadDynamicMatches() {
+            try {
+                let res = await fetch('/api/matches');
+                let data = await res.json();
+                let container = document.getElementById('dynamic-matches-container');
+                container.innerHTML = '';
+                
+                if (data.matches) {
+                    data.matches.forEach(m => {
+                        let card = document.createElement('div');
+                        card.className = 'match-card';
+                        card.dataset.region = m.region;
+                        card.dataset.platform = m.platform;
+                        card.dataset.gamemode = m.gamemode;
+                        card.dataset.fee = m.entry_fee;
+                        card.dataset.time = '10'; // Valeur arbitraire pour être en haut de liste avec le tri 'Newest'
+
+                        let title = m.gamemode === '1v1' ? '1V1 REALISTIC' : '2V2 ZONE WARS';
+
+                        card.innerHTML = `
+                            <div class="match-header">
+                                <div class="match-title">${title} <span class="badge-edit" style="background: rgba(139, 92, 246, 0.2); color: var(--primary); border-color: var(--primary);">CUSTOM MATCH</span></div>
+                                <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 20px; border-radius: 50%;">
+                            </div>
+                            <div class="match-tags">
+                                <span class="tag">${m.region}</span>
+                                <span class="tag purple">${m.platform.toUpperCase()}</span>
+                            </div>
+                            <div class="match-details">
+                                <div class="detail-box"><span>FIRST TO</span><strong><i class="fa-solid fa-flag" style="color: var(--gold);"></i> 5</strong></div>
+                                <div class="detail-box" style="text-align: right;"><span>STATUS</span><strong><i class="fa-solid fa-circle-notch fa-spin" style="color: var(--success);"></i> WAITING</strong></div>
+                            </div>
+                            <div class="match-finance">
+                                <div class="finance-box"><span>ENTRY FEE</span><strong><i class="fa-solid fa-coins" style="color: var(--gold);"></i> ${parseFloat(m.entry_fee).toFixed(2)}</strong></div>
+                                <i class="fa-solid fa-arrow-right" style="color: var(--border-color);"></i>
+                                <div class="finance-box prize" style="text-align: right;"><span>PRIZE</span><strong><i class="fa-solid fa-crown" style="color: var(--success);"></i> ${parseFloat(m.prize).toFixed(2)}</strong></div>
+                            </div>
+                            <button class="btn-join" onclick="joinDynamicMatch(${m.id}, ${m.entry_fee})">JOIN MATCH</button>
+                        `;
+                        container.appendChild(card);
+                    });
+                }
+                applyFilteringAndSorting('newest'); // Réapplique le filtre actuel sur les nouveaux matchs chargés
+            } catch (e) {
+                console.error("Erreur chargement matchs:", e);
+            }
+        }
+
+        async function submitCreateMatch() {
+            let region = document.getElementById('create-region').value;
+            let platform = document.getElementById('create-platform').value;
+            let gamemode = document.getElementById('create-gamemode').value;
+            let fee = parseFloat(document.getElementById('create-fee').value);
+
+            if(!fee || fee <= 0) {
+                alert('Veuillez entrer une mise valide.'); return;
+            }
+
+            try {
+                let res = await fetch('/api/matches/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ region, platform, gamemode, entry_fee: fee })
+                });
+                let data = await res.json();
+                if(data.success) {
+                    alert("Match créé et Tokens déduits ! En attente d'un adversaire...");
+                    currentBalance = data.new_balance;
+                    updateAllBalances();
+                    closeModal('modal-create-match');
+                    loadDynamicMatches(); // Rafraîchir la liste de l'accueil
+                } else {
+                    alert('Erreur : ' + (data.error || 'Impossible de créer le match'));
+                }
+            } catch (e) {
+                alert('Erreur réseau.');
+            }
+        }
+
+        async function joinDynamicMatch(id, fee) {
+            if(confirm(`Voulez-vous vraiment rejoindre ce match pour ${fee} Tokens ?`)) {
+                try {
+                    let res = await fetch('/api/matches/join', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ match_id: id })
+                    });
+                    let data = await res.json();
+                    if(data.success) {
+                        alert('Match rejoint avec succès ! Redirection vers le serveur de jeu...');
+                        currentBalance = data.new_balance;
+                        updateAllBalances();
+                        loadDynamicMatches(); // Rafraîchit la liste (le match va disparaître vu qu'il n'est plus "WAITING")
+                    } else {
+                        alert('Erreur : ' + (data.error || 'Impossible de rejoindre'));
+                    }
+                } catch(e) {
+                    alert('Erreur réseau.');
+                }
             }
         }
 
