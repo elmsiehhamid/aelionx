@@ -4,13 +4,19 @@ import sqlite3
 import requests
 import base64
 
-app = Flask(__name__, template_folder='.') # Cherche index.html dans le même dossier
+app = Flask(__name__, template_folder='.')
 app.secret_key = "9664c42e441bbd49bdc5ac31dc550bead16d49bffb395e5e185e2f72085a638d"
 
 # ================= CONFIGURATION =================
 DOMAIN_URL = "https://aelionx.onrender.com" 
 
-# PAYPAL API
+# 1. EPIC GAMES OAUTH2 (Vraie Connexion)
+# Il faudra que tu crées une application sur dev.epicgames.com pour avoir ces clés
+EPIC_CLIENT_ID = "xyza7891k9NrmSzmyZc1wPaDM8H2G1zu"
+EPIC_CLIENT_SECRET = "utdW2eU78ctM1QGwtEaTpCZBUVAPTx8E3v8JEP18vs0"
+EPIC_REDIRECT_URI = f"{DOMAIN_URL}/callback/epic"
+
+# 2. PAYPAL API
 PAYPAL_CLIENT_ID = "AZnJoA4KhCvofBX4gnAEoszq7U8WMPZaFCvuxNBP0f6iEWKhBT19d71tewTNJ4mZhsBjkGtWuBSV5n0G"
 PAYPAL_SECRET = "EF5L9PIRmbiP2QkwmXQOfj5js4hE52zPCPdCUXf0mXFA43rgIo10ahOhQ-qcNPNU4ejsQRgF8uEJiH5i"
 PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com" # Remplace par api-m.paypal.com en réel
@@ -64,24 +70,54 @@ def api_me():
         return jsonify({"logged_in": True, "balance": user[1], "username": session['username']})
     return jsonify({"logged_in": False})
 
-# --- 1. CONNEXION VIA EPIC GAMES SEULEMENT ---
-@app.route('/api/link/epic', methods=['POST'])
-@app.route('/link/epic', methods=['POST'])
-def link_epic():
+# --- 1. CONNEXION OFFICIELLE EPIC GAMES ---
+@app.route('/login/epic')
+def login_epic():
+    # Redirige le joueur vers la vraie page de connexion d'Epic Games
+    epic_auth_url = f"https://www.epicgames.com/id/authorize?client_id={EPIC_CLIENT_ID}&response_type=code&scope=basic_profile&redirect_uri={EPIC_REDIRECT_URI}"
+    return redirect(epic_auth_url)
+
+@app.route('/callback/epic')
+def callback_epic():
+    code = request.args.get('code')
+    if not code:
+        return "Erreur : Code d'autorisation manquant.", 400
+        
+    # On échange le code secret contre les informations du joueur
+    token_url = "https://api.epicgames.dev/epic/oauth/v2/token"
+    auth_str = f"{EPIC_CLIENT_ID}:{EPIC_CLIENT_SECRET}"
+    b64_auth = base64.b64encode(auth_str.encode()).decode()
+    
+    headers = {
+        "Authorization": f"Basic {b64_auth}",
+        "Content-Type": "application/x-www-form-urlencoded"
+    }
+    data = {
+        "grant_type": "authorization_code",
+        "code": code,
+        "redirect_uri": EPIC_REDIRECT_URI
+    }
+    
     try:
-        req_data = request.get_json(silent=True) or {}
-        epic_id = req_data.get('epic_id')
-        if not epic_id: return jsonify({"error": "Pseudo Epic manquant"}), 400
+        r = requests.post(token_url, headers=headers, data=data)
+        token_data = r.json()
+        
+        if "access_token" not in token_data:
+            return f"Erreur de connexion Epic (Clés invalides ?) : {token_data}", 400
             
-        # L'ID Epic devient la connexion principale du joueur
-        session['user_id'] = epic_id
-        session['username'] = epic_id
+        epic_account_id = token_data.get("account_id")
+        epic_display_name = token_data.get("displayName", epic_account_id)
         
-        get_user(epic_id) # Crée le profil s'il n'existe pas
+        # Le joueur est connecté avec succès !
+        session['user_id'] = epic_account_id
+        session['username'] = epic_display_name
         
-        return jsonify({"success": True, "message": f"Connecté en tant que {epic_id} avec succès !"})
+        get_user(epic_account_id) # Initialise en base de données
+        
+        return redirect('/?epic_success=true')
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return f"Erreur serveur avec Epic Games : {str(e)}", 500
+
 
 # --- 2. MATCHS ---
 @app.route('/api/matches', methods=['GET'])
@@ -96,7 +132,7 @@ def get_matches():
 
 @app.route('/api/matches/create', methods=['POST'])
 def create_match():
-    if 'user_id' not in session: return jsonify({"error": "Veuillez lier votre compte Epic Games d'abord."}), 403
+    if 'user_id' not in session: return jsonify({"error": "Veuillez vous connecter avec Epic Games d'abord."}), 403
     req = request.get_json(silent=True) or {}
     fee = float(req.get('entry_fee', 0))
     if fee <= 0: return jsonify({"error": "Mise invalide"}), 400
@@ -119,7 +155,7 @@ def create_match():
 
 @app.route('/api/matches/join', methods=['POST'])
 def join_match():
-    if 'user_id' not in session: return jsonify({"error": "Veuillez lier votre compte Epic Games d'abord."}), 403
+    if 'user_id' not in session: return jsonify({"error": "Veuillez vous connecter avec Epic Games d'abord."}), 403
     req = request.get_json(silent=True) or {}
     match_id = req.get('match_id')
     user_id = session['user_id']
@@ -154,7 +190,7 @@ def join_match():
 # --- 3. RETRAITS ---
 @app.route('/api/withdraw', methods=['POST'])
 def withdraw():
-    if 'user_id' not in session: return jsonify({"error": "Veuillez lier votre compte Epic Games d'abord."}), 403
+    if 'user_id' not in session: return jsonify({"error": "Veuillez vous connecter avec Epic Games d'abord."}), 403
     req_data = request.get_json(silent=True) or {}
     amount = float(req_data.get('amount', 0))
     paypal_email = req_data.get('email', '')
@@ -186,7 +222,7 @@ def get_paypal_token():
 @app.route('/pay/create', methods=['POST'])
 def create_payment():
     try:
-        if 'user_id' not in session: return jsonify({"error": "Veuillez lier votre compte Epic Games d'abord."}), 403
+        if 'user_id' not in session: return jsonify({"error": "Veuillez vous connecter avec Epic Games d'abord."}), 403
         req_data = request.get_json(silent=True) or {}
         amount = req_data.get('amount', 10.0)
         token = get_paypal_token()
