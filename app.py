@@ -8,8 +8,8 @@ app = Flask(__name__, template_folder='.') # Cherche index.html dans le même do
 app.secret_key = "9664c42e441bbd49bdc5ac31dc550bead16d49bffb395e5e185e2f72085a638d"
 
 # ================= CONFIGURATION =================
-# Ton vrai nom de domaine en ligne
-DOMAIN_URL = "https://aelionx.com" 
+# Ton nom de domaine en ligne sur Render
+DOMAIN_URL = "https://aelionx.onrender.com" 
 
 # 1. DISCORD OAUTH2 (Connexion des joueurs)
 DISCORD_CLIENT_ID = "1531436256129450124"
