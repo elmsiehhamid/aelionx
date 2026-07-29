@@ -1065,12 +1065,7 @@
                 <p style="color: var(--text-muted); font-size: 13px; margin-top: 5px;">This will be your primary account to play matches and tournaments.</p>
             </div>
 
-            <div style="margin-bottom: 15px;">
-                <label style="font-size: 12px; font-weight: bold; color: var(--text-muted); text-transform: uppercase;">Epic Username</label>
-                <input type="text" id="epic-username-input" placeholder="ex: Ninja" style="width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; color: white; margin-top: 5px; outline: none; font-family: 'Poppins';">
-            </div>
-
-            <button class="btn-full-gold" onclick="linkEpicAccount()" style="background: var(--primary); color: white;">Connect & Link Account</button>
+            <button class="btn-full-gold" onclick="linkEpicAccount()" style="background: var(--primary); color: white;">Connect with Epic Games</button>
         </div>
     </div>
 
@@ -1136,6 +1131,13 @@
 
         // Chargement initial
         window.onload = async () => {
+            // Vérifie si on revient d'une connexion Epic réussie
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('epic_success') === 'true') {
+                showSuccess("Compte Epic Games connecté avec succès !");
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
             try {
                 let res = await fetch('/api/me');
                 let data = await res.json();
@@ -1362,7 +1364,6 @@
             document.getElementById('confirm-item-name').innerText = itemName;
             document.getElementById('confirm-item-price').innerText = price.toFixed(2) + " Tokens";
             
-            // On s'assure que le bouton exécute bien l'achat de boutique
             let btn = document.getElementById('btn-confirm-buy');
             btn.onclick = executePurchase;
 
@@ -1428,40 +1429,9 @@
             openModal('modal-purchase');
         }
 
-        async function linkEpicAccount() {
-            let epicInput = document.getElementById('epic-username-input');
-            let epicId = epicInput ? epicInput.value.trim() : '';
-            if (!epicId) {
-                showError('Veuillez entrer un pseudo Epic Games valide.');
-                return;
-            }
-            try {
-                let response = await fetch('/api/link/epic', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ epic_id: epicId })
-                });
-                let data = await response.json();
-                if (response.ok && data.success) {
-                    document.getElementById('success-epic-name').innerText = epicId;
-                    if(document.getElementById('profile-name-display')) {
-                        document.getElementById('profile-name-display').innerText = epicId;
-                    }
-                    openModal('modal-epic-success');
-                    // On force le rafraîchissement de la session côté JS
-                    let res = await fetch('/api/me');
-                    let meData = await res.json();
-                    if (meData.logged_in) {
-                        currentBalance = meData.balance;
-                        updateAllBalances();
-                    }
-                } else {
-                    showError(data.error || "Impossible d'associer le compte Epic.");
-                }
-            } catch (error) {
-                console.error('Erreur:', error);
-                showError('Erreur de connexion au serveur.');
-            }
+        // Redirige directement vers la vraie route de connexion officielle Epic Games de ton app.py
+        function linkEpicAccount() {
+            window.location.href = '/login/epic';
         }
 
         async function processPayment() {
@@ -1573,12 +1543,10 @@
         }
 
         function joinDynamicMatch(id, fee) {
-            // On utilise la fenêtre de confirmation pour rejoindre le match
             document.getElementById('confirm-item-name').innerText = "Frais d'entrée au Match";
             document.getElementById('confirm-item-price').innerText = parseFloat(fee).toFixed(2) + " Tokens";
             
             let btn = document.getElementById('btn-confirm-buy');
-            // On remplace temporairement l'action du bouton par "Rejoindre"
             btn.onclick = function() { executeJoinMatch(id, fee); };
             
             openModal('modal-confirm');
