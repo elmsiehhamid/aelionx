@@ -409,9 +409,6 @@
             <div style="flex: 1;" class="mobile-spacer"></div>
 
             <div class="user-panel">
-
-                <!-- LE BOUTON DISCORD A ÉTÉ TOTALEMENT SUPPRIMÉ ICI -->
-
                 <button class="btn-epic" onclick="openModal('modal-epic')">
                     <i class="fa-solid fa-link"></i> <span>Link Epic</span>
                 </button>
@@ -1096,11 +1093,39 @@
         </div>
     </div>
 
+    <!-- NOUVELLE MODALE D'ERREUR GLOBALE -->
+    <div id="modal-error" class="modal-overlay">
+        <div class="modal-content" style="text-align: center; max-width: 380px; padding: 40px 30px;">
+            <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-error')"></i>
+            
+            <div style="width: 70px; height: 70px; background: rgba(239, 68, 68, 0.1); border: 2px solid var(--danger); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+                <i class="fa-solid fa-xmark" style="font-size: 35px; color: var(--danger);"></i>
+            </div>
+
+            <h3 style="margin-bottom: 10px; font-size: 22px;">Action Impossible</h3>
+            <p id="error-message-text" style="color: var(--text-muted); font-size: 14px; margin-bottom: 25px;">
+                Une erreur est survenue.
+            </p>
+
+            <button class="btn-full-gold" onclick="closeModal('modal-error')" style="background: var(--bg-card); color: white; border: 1px solid var(--border-color); margin-top: 0;">
+                Fermer
+            </button>
+        </div>
+    </div>
+
     <!-- SCRIPTS INTERACTIFS -->
     <script>
         let currentBalance = 0.00;
         let selectedTokenAmount = 10;
         let selectedTokenPrice = "10.00";
+        let itemToBuyName = "";
+        let itemToBuyPrice = 0;
+
+        // Fonction globale pour afficher les erreurs joliment
+        function showError(message) {
+            document.getElementById('error-message-text').innerText = message;
+            openModal('modal-error');
+        }
 
         // Chargement initial
         window.onload = async () => {
@@ -1156,7 +1181,7 @@
             let btn = document.getElementById('btn-withdraw-action');
 
             if (!amountInput || !emailInput) {
-                alert("Veuillez remplir tous les champs.");
+                showError("Veuillez remplir tous les champs.");
                 return;
             }
 
@@ -1182,13 +1207,13 @@
                         btn.style.pointerEvents = "auto";
                     }, 1000);
                 } else {
-                    alert('Erreur : ' + (data.error || "Impossible de traiter la demande."));
+                    showError(data.error || "Impossible de traiter la demande.");
                     btn.innerHTML = 'REQUEST WITHDRAWAL';
                     btn.style.pointerEvents = "auto";
                 }
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('Erreur réseau avec le serveur.');
+                showError('Erreur de connexion au serveur.');
                 btn.innerHTML = 'REQUEST WITHDRAWAL';
                 btn.style.pointerEvents = "auto";
             }
@@ -1357,7 +1382,7 @@
                         btn.innerHTML = 'Purchase';
                         btn.style.background = "var(--primary)";
                         btn.style.pointerEvents = "auto";
-                        openModal('modal-purchase');
+                        showError('Fonds insuffisants pour acheter cet article.');
                     }, 1200);
                 }
             }, 1000);
@@ -1394,7 +1419,7 @@
             let epicInput = document.getElementById('epic-username-input');
             let epicId = epicInput ? epicInput.value.trim() : '';
             if (!epicId) {
-                alert('Veuillez entrer un pseudo Epic Games valide.');
+                showError('Veuillez entrer un pseudo Epic Games valide.');
                 return;
             }
             try {
@@ -1418,11 +1443,11 @@
                         updateAllBalances();
                     }
                 } else {
-                    alert('Erreur : ' + (data.error || "Impossible d'associer le compte Epic."));
+                    showError(data.error || "Impossible d'associer le compte Epic.");
                 }
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('Erreur réseau avec le serveur.');
+                showError('Erreur de connexion au serveur.');
             }
         }
 
@@ -1441,14 +1466,14 @@
                 if (data.payment_url) {
                     window.location.href = data.payment_url;
                 } else {
-                    alert('Erreur: ' + (data.error || 'Impossible de contacter PayPal'));
+                    showError(data.error || 'Impossible de contacter PayPal');
                     btn.innerHTML = `Payer avec PayPal <span id="btn-pay-price">$${selectedTokenPrice}</span>`;
                     btn.style.opacity = "1";
                     btn.style.pointerEvents = "auto";
                 }
             } catch (error) {
                 console.error('Erreur:', error);
-                alert('Erreur réseau avec le serveur.');
+                showError('Erreur de connexion au serveur.');
                 btn.innerHTML = `Payer avec PayPal <span id="btn-pay-price">$${selectedTokenPrice}</span>`;
                 btn.style.opacity = "1";
                 btn.style.pointerEvents = "auto";
@@ -1510,7 +1535,7 @@
             let fee = parseFloat(document.getElementById('create-fee').value);
 
             if(!fee || fee <= 0) {
-                alert('Veuillez entrer une mise valide.'); return;
+                showError('Veuillez entrer une mise valide.'); return;
             }
 
             try {
@@ -1527,10 +1552,10 @@
                     closeModal('modal-create-match');
                     loadDynamicMatches(); 
                 } else {
-                    alert('Erreur : ' + (data.error || 'Impossible de créer le match'));
+                    showError(data.error || 'Impossible de créer le match');
                 }
             } catch (e) {
-                alert('Erreur réseau.');
+                showError('Erreur de connexion au serveur.');
             }
         }
 
@@ -1549,10 +1574,10 @@
                         updateAllBalances();
                         loadDynamicMatches(); 
                     } else {
-                        alert('Erreur : ' + (data.error || 'Impossible de rejoindre'));
+                        showError(data.error || 'Impossible de rejoindre');
                     }
                 } catch(e) {
-                    alert('Erreur réseau.');
+                    showError('Erreur de connexion au serveur.');
                 }
             }
         }
