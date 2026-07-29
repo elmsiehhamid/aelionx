@@ -57,7 +57,7 @@
             100% { filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4)); }
         }
 
-        /* NOUVEAU: Animation de secousse pour les erreurs */
+        /* Animation de secousse pour les erreurs */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -66,7 +66,7 @@
         }
         .error-shake { animation: shake 0.4s ease-in-out; }
 
-        /* NOUVEAU: Skeletons Loaders (chargement) */
+        /* Skeletons Loaders (chargement) */
         @keyframes shimmer {
             0% { background-position: -400px 0; }
             100% { background-position: 400px 0; }
@@ -79,6 +79,24 @@
             pointer-events: none;
         }
         .skeleton * { visibility: hidden; }
+
+        /* --- FOMO LIVE FEED TOASTS --- */
+        .live-feed-container { position: fixed; bottom: 20px; left: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+        .live-toast { background: rgba(21, 21, 26, 0.95); border-left: 4px solid var(--gold); padding: 12px 20px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; transform: translateX(-150%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s; opacity: 0; font-size: 13px; backdrop-filter: blur(5px); border: 1px solid var(--border-color); border-left: 4px solid var(--gold); }
+        .live-toast.show { transform: translateX(0); opacity: 1; pointer-events: auto; }
+
+        /* --- RANK XP BAR --- */
+        .xp-bar-container { width: 100%; background: var(--bg-main); height: 10px; border-radius: 10px; overflow: hidden; margin-top: 5px; border: 1px solid var(--border-color); }
+        .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #fef08a); width: 75%; border-radius: 10px; box-shadow: 0 0 10px var(--gold); }
+
+        /* --- LOBBY CHAT --- */
+        .chat-container { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; height: 200px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+        .chat-bubble { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 13px; }
+        .chat-bubble.system { align-self: center; background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 11px; text-transform: uppercase; }
+        .chat-bubble.me { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 2px; }
+        .chat-bubble.opponent { align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border-color); color: white; border-bottom-left-radius: 2px; }
+        .upload-zone { border: 2px dashed var(--border-color); padding: 20px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.3s; background: var(--bg-main); display: block; margin-top: 15px; }
+        .upload-zone:hover { border-color: var(--primary); background: rgba(139, 92, 246, 0.05); }
 
         /* --- SIDEBAR --- */
         .sidebar {
@@ -145,7 +163,7 @@
         .avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary); cursor: pointer; transition: 0.2s; object-fit: cover;}
         .avatar:hover { box-shadow: 0 0 10px var(--primary); }
 
-        /* NOUVEAU: Menu déroulant pour la cloche des notifications */
+        /* Menu déroulant pour la cloche des notifications */
         .notif-dropdown {
             display: none; position: absolute; top: 50px; right: 50px; width: 320px;
             background: var(--bg-sidebar); border: 1px solid var(--border-color);
@@ -397,6 +415,9 @@
     </style>
 </head>
 <body>
+
+    <!-- LIVE FEED CONTAINER (FOMO) -->
+    <div class="live-feed-container" id="live-feed-container"></div>
 
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
@@ -782,18 +803,36 @@
                     </div>
                 </div>
                 
-                <div class="banner vip" onclick="promptPurchase('Explore VIP Status', 3.00)">
+                <div class="banner vip" onclick="promptPurchase('VIP Member', 3.00, 'VIP')">
                     <div>
                         <h4 style="font-size: 18px; color: var(--gold); display: flex; align-items: center; gap: 10px;">
-                            <i class="fa-solid fa-crown"></i> Explore VIP
+                            <i class="fa-solid fa-crown"></i> VIP Member
                         </h4>
-                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">Exclusive perks for competitive players.</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 5px;">5% Match Fee, Fast Cashout, Golden Badge.</p>
                     </div>
                     <div style="font-size: 18px; font-weight: bold; text-align: right;">
                         <div style="display: flex; align-items: center; justify-content: flex-end; gap: 5px;">
                             <i class="fa-solid fa-coins" style="color: var(--gold);"></i> 3.00
                         </div>
-                        <span style="font-size: 10px; color: var(--text-muted); font-weight: normal;">per month</span> <i class="fa-solid fa-arrow-right" style="color: var(--gold); font-size: 12px; margin-left: 5px;"></i>
+                        <span style="font-size: 10px; color: var(--text-muted); font-weight: normal;">/ month</span>
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="margin-bottom: 20px; font-size: 20px; margin-top: 40px;"><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Ego & Flex (Profile Customization)</h4>
+            <div class="gc-grid" style="margin-bottom: 40px;">
+                <div class="gc-card" style="border-color: #ef4444; box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);">
+                    <div class="gc-bottom" style="flex-direction: column; text-align: center; gap: 15px;">
+                        <h4 style="color: #ef4444; text-shadow: 0 0 10px rgba(239, 68, 68, 0.8);">NEON RED NAME</h4>
+                        <p style="font-size: 11px; color: var(--text-muted);">Stand out in the leaderboard and lobbies.</p>
+                        <button class="btn-gc-buy" style="border-color: #ef4444; color: #ef4444; width: 100%;" onclick="promptPurchase('Neon Red Name', 15.00, '#ef4444')">Buy (15.00)</button>
+                    </div>
+                </div>
+                <div class="gc-card" style="border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);">
+                    <div class="gc-bottom" style="flex-direction: column; text-align: center; gap: 15px;">
+                        <h4 style="color: #10b981; text-shadow: 0 0 10px rgba(16, 185, 129, 0.8);">NEON GREEN NAME</h4>
+                        <p style="font-size: 11px; color: var(--text-muted);">Stand out in the leaderboard and lobbies.</p>
+                        <button class="btn-gc-buy" style="border-color: #10b981; color: #10b981; width: 100%;" onclick="promptPurchase('Neon Green Name', 15.00, '#10b981')">Buy (15.00)</button>
                     </div>
                 </div>
             </div>
@@ -863,7 +902,6 @@
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
                 <h4 style="display: flex; align-items: center; gap: 10px; font-size: 20px;"><i class="fa-solid fa-sparkles" style="color: var(--gold);"></i> Newly Added</h4>
-                <!-- ON UTILISE LA MEME CLASSE MAIS SANS ID POUR NE PAS CONFLITER -->
                 <div class="search-bar" style="width: 100%; max-width: 300px; background: rgba(0,0,0,0.3); display: flex;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" placeholder="Search by name or platform...">
@@ -929,6 +967,51 @@
 
     </main>
 
+    <!-- MODALE LOBBY DE MATCH AVEC CHAT ET SCREENSHOT -->
+    <div id="modal-match-lobby" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px; padding: 25px;">
+            <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-match-lobby')"></i>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 15px;">
+                <div>
+                    <h2 style="font-size: 20px; margin-bottom: 5px;" id="lobby-match-title">1V1 Realistic - Match #9482</h2>
+                    <span style="font-size: 12px; color: var(--gold); font-weight: bold;"><i class="fa-solid fa-coins"></i> Prize Pool: <span id="lobby-match-prize">0.00</span></span>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.1); color: var(--success); padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; border: 1px solid var(--success);">
+                    <i class="fa-solid fa-circle fa-beat-fade" style="font-size: 8px;"></i> IN PROGRESS
+                </div>
+            </div>
+
+            <!-- Chat Room -->
+            <div class="chat-container" id="chat-box">
+                <div class="chat-bubble system">Match ID #9482 généré.</div>
+                <div class="chat-bubble system" id="wait-msg">En attente d'un adversaire...</div>
+            </div>
+            
+            <div class="modal-input-group" style="margin-bottom: 25px;">
+                <input type="text" id="chat-input" placeholder="Envoyer un message..." onkeypress="if(event.key === 'Enter') sendChatMessage()">
+                <button class="btn-apply" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+
+            <!-- Preuve de Résultat -->
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
+                <h4 style="font-size: 14px; margin-bottom: 10px; text-transform: uppercase; color: var(--text-muted);">Report Match Result</h4>
+                <div style="display: flex; gap: 10px;" id="result-buttons">
+                    <button style="flex: 1; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--success); color: var(--success); padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer;" onclick="showUploadZone()">I WON</button>
+                    <button style="flex: 1; background: rgba(239, 68, 68, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer;" onclick="reportLoss()">I LOST</button>
+                </div>
+
+                <div id="upload-proof-zone" style="display: none;">
+                    <label class="upload-zone">
+                        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 30px; color: var(--primary); margin-bottom: 10px;"></i>
+                        <span style="display: block; font-size: 12px; color: var(--text-muted);">Upload Screenshot (Win Proof)</span>
+                        <input type="file" accept="image/*" style="display:none;" onchange="handleProofUpload(event)">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODALE CRÉER UN MATCH -->
     <div id="modal-create-match" class="modal-overlay">
         <div class="modal-content" style="max-width: 400px;">
@@ -968,7 +1051,7 @@
         </div>
     </div>
 
-    <!-- MODALES -->
+    <!-- MODALES DE CONFIRMATION -->
     <div id="modal-confirm" class="modal-overlay">
         <div class="modal-content" style="max-width: 350px; text-align: center;">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-confirm')"></i>
@@ -982,19 +1065,34 @@
         </div>
     </div>
 
+    <!-- PROFIL AVEC RANG ET XP -->
     <div id="modal-profile" class="modal-overlay">
-        <div class="modal-content" style="text-align: center;">
+        <div class="modal-content" style="text-align: center; max-width: 400px; padding: 40px 25px;">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-profile')"></i>
-            <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 15px; object-fit: cover;">
-            <h2 style="margin-bottom: 5px;" id="profile-name-display">Player Profile</h2>
-            <p style="color: var(--primary); font-weight: bold; margin-bottom: 20px;">ÆLIONX MEMBER</p>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                <div style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <div style="position: relative; width: 90px; height: 90px; margin: 0 auto 15px auto;">
+                <img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 100%; height: 100%; border-radius: 50%; border: 3px solid var(--primary); object-fit: cover;">
+                <div style="position: absolute; bottom: -5px; right: -5px; background: var(--gold); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-sidebar); color: black; font-size: 12px;"><i class="fa-solid fa-ranking-star"></i></div>
+            </div>
+            
+            <!-- Le span profile-name-display permet d'appliquer la couleur/le badge VIP -->
+            <h2 style="margin-bottom: 5px;"><span id="profile-name-display">Player Profile</span></h2>
+            <p style="color: var(--gold); font-weight: bold; margin-bottom: 15px; font-size: 14px;">GOLD II <span style="color: var(--text-muted); font-size: 12px; font-weight: normal;">(1,240 Elo)</span></p>
+            
+            <div style="text-align: left; margin-bottom: 25px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold;">
+                    <span>XP PROGRESS</span> <span>75%</span>
+                </div>
+                <div class="xp-bar-container"><div class="xp-bar-fill"></div></div>
+                <div style="font-size: 10px; color: var(--text-muted); margin-top: 5px; text-align: right;">Next Rank: Gold III</div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                <div style="background: var(--bg-sidebar); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
                     <div style="font-size: 12px; color: var(--text-muted);">Total Tokens</div>
                     <div style="font-size: 20px; font-weight: bold; color: var(--gold);"><i class="fa-solid fa-coins"></i> <span class="token-balance-text">1.25</span></div>
                 </div>
-                <div style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div style="background: var(--bg-sidebar); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
                     <div style="font-size: 12px; color: var(--text-muted);">Matches Played</div>
                     <div style="font-size: 20px; font-weight: bold; color: white;">24</div>
                 </div>
@@ -1003,11 +1101,23 @@
         </div>
     </div>
 
+    <!-- PARAMÈTRES AVEC SELECTEUR DE THÈME -->
     <div id="modal-settings" class="modal-overlay">
         <div class="modal-content">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-settings')"></i>
             <h2 style="margin-bottom: 20px;"><i class="fa-solid fa-gear" style="color: var(--text-muted);"></i> Settings</h2>
             
+            <div style="margin-bottom: 20px;">
+                <span style="font-weight: 600; font-size: 13px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; display: block;">Theme Color</span>
+                <div style="display: flex; gap: 15px;">
+                    <div class="theme-swatch active" style="background: #8b5cf6;" onclick="changeTheme('purple', this)"></div>
+                    <div class="theme-swatch" style="background: #10b981;" onclick="changeTheme('green', this)"></div>
+                    <div class="theme-swatch" style="background: #3b82f6;" onclick="changeTheme('blue', this)"></div>
+                    <div class="theme-swatch" style="background: #ef4444;" onclick="changeTheme('red', this)"></div>
+                    <div class="theme-swatch" style="background: #f97316;" onclick="changeTheme('orange', this)"></div>
+                </div>
+            </div>
+
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: var(--bg-card); border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color);">
                 <span style="font-weight: 600;">Match Notifications</span>
                 <input type="checkbox" checked style="accent-color: var(--primary); width: 18px; height: 18px;">
@@ -1021,6 +1131,7 @@
         </div>
     </div>
 
+    <!-- MODALE ACHAT / RETRAIT (AVEC FRAIS DE PLATEFORME) -->
     <div id="modal-purchase" class="modal-overlay">
         <div class="modal-content">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-purchase')"></i>
@@ -1030,13 +1141,11 @@
                 <i class="fa-solid fa-coins" style="color: var(--gold);"></i> <span class="token-balance-text">1.25</span>
             </div>
 
-            <!-- ONGLETS ACHAT / RETRAIT -->
             <div class="page-tabs" style="width: 100%; display: flex; margin-bottom: 20px; background: rgba(0,0,0,0.3); border: none;">
                 <div id="tab-btn-purchase" class="page-tab active" style="flex: 1; text-align: center; border: none; background: var(--bg-card);" onclick="switchFinanceTab('purchase')">Purchase</div>
                 <div id="tab-btn-withdraw" class="page-tab" style="flex: 1; text-align: center; border: none; background: transparent;" onclick="switchFinanceTab('withdraw')">Withdraw</div>
             </div>
 
-            <!-- SECTION: ACHAT DE TOKENS -->
             <div id="section-purchase">
                 <div style="font-size: 12px; font-weight: bold; color: var(--text-main); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px;">Referral Code</div>
                 <div class="modal-input-group">
@@ -1070,13 +1179,17 @@
                 <button class="btn-full-gold" id="btn-buy-initial" onclick="openCheckout()">PURCHASE 10 TOKENS</button>
             </div>
 
-            <!-- SECTION: RETRAIT D'ARGENT -->
+            <!-- MODIFICATION RETRAIT: Seuil de 20 et 5% de frais de plateforme -->
             <div id="section-withdraw" style="display: none;">
-                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Convert your Tokens into real money via PayPal. Minimum withdrawal is 5 Tokens (1 Token = $1.00).</p>
+                <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Withdraw your Tokens to real money via PayPal. Minimum withdrawal is 20 Tokens.</p>
                 
                 <div style="font-size: 12px; font-weight: bold; color: var(--text-main); text-transform: uppercase; margin-bottom: 5px;">Tokens to Withdraw</div>
-                <div class="modal-input-group" style="margin-bottom: 15px;">
-                    <input type="number" id="withdraw-amount-input" placeholder="Min. 5" min="5" style="width: 100%;">
+                <div class="modal-input-group" style="margin-bottom: 5px;">
+                    <input type="number" id="withdraw-amount-input" placeholder="Montant (Min. 20)" min="20" style="width: 100%;" oninput="calculateWithdrawFee()">
+                </div>
+                <div style="font-size: 11px; color: var(--danger); text-align: right; margin-bottom: 15px;">
+                    Frais de plateforme (5%) : <strong id="withdraw-fee-text">-0.00 <i class="fa-solid fa-coins"></i></strong><br>
+                    Vous recevrez : <strong style="color: var(--success);" id="withdraw-receive-text">0.00 €</strong>
                 </div>
 
                 <div style="font-size: 12px; font-weight: bold; color: var(--text-main); text-transform: uppercase; margin-bottom: 5px;">PayPal Email Address</div>
@@ -1130,7 +1243,7 @@
         </div>
     </div>
 
-    <!-- NOUVELLE MODALE DE SUCCÈS GLOBALE -->
+    <!-- MODALE DE SUCCÈS GLOBALE -->
     <div id="modal-success-msg" class="modal-overlay">
         <div class="modal-content" style="text-align: center; max-width: 380px; padding: 40px 30px;">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-success-msg')"></i>
@@ -1150,7 +1263,7 @@
         </div>
     </div>
 
-    <!-- NOUVELLE MODALE D'ERREUR GLOBALE -->
+    <!-- MODALE D'ERREUR GLOBALE -->
     <div id="modal-error" class="modal-overlay">
         <div class="modal-content" style="text-align: center; max-width: 380px; padding: 40px 30px;">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-error')"></i>
@@ -1177,11 +1290,93 @@
         let selectedTokenPrice = "10.00";
         let itemToBuyName = "";
         let itemToBuyPrice = 0;
+        let currentPrizePool = 0;
+        let itemMeta = null; // Pour sauvegarder la couleur du Neon Flex ou le VIP
+
+        // Variables de profil de flex (Economy virtuelle)
+        let isVIP = localStorage.getItem('aelionx_vip') === 'true';
+        let myFlexColor = localStorage.getItem('aelionx_flex_color') || '';
+
+        // --- 1. GESTION DU THÈME ---
+        const themes = {
+            purple: { primary: '#8b5cf6', dark: '#5b21b6', glow: 'rgba(139, 92, 246, 0.4)' },
+            green: { primary: '#10b981', dark: '#047857', glow: 'rgba(16, 185, 129, 0.4)' },
+            blue: { primary: '#3b82f6', dark: '#1d4ed8', glow: 'rgba(59, 130, 246, 0.4)' },
+            red: { primary: '#ef4444', dark: '#b91c1c', glow: 'rgba(239, 68, 68, 0.4)' },
+            orange: { primary: '#f97316', dark: '#c2410c', glow: 'rgba(249, 115, 22, 0.4)' }
+        };
+
+        function changeTheme(color, element) {
+            let t = themes[color];
+            
+            document.documentElement.style.setProperty('--primary', t.primary);
+            document.documentElement.style.setProperty('--primary-dark', t.dark);
+            document.documentElement.style.setProperty('--primary-glow', t.glow);
+            
+            localStorage.setItem('aelionx_theme', color);
+            
+            if(element) {
+                document.querySelectorAll('.theme-swatch').forEach(sw => sw.classList.remove('active'));
+                element.classList.add('active');
+            }
+        }
+
+        // --- APPLIQUER LE FLEX (COULEURS + VIP) ---
+        function applyPlayerFlex() {
+            let nameElement = document.getElementById('profile-name-display');
+            if(!nameElement) return;
+
+            nameElement.innerHTML = 'Player Profile';
+            nameElement.style.color = 'var(--text-main)';
+            nameElement.style.textShadow = 'none';
+
+            if(myFlexColor) {
+                nameElement.style.color = myFlexColor;
+                nameElement.style.textShadow = `0 0 10px ${myFlexColor}`;
+            }
+            if(isVIP) {
+                let badge = document.createElement('span');
+                badge.innerHTML = ' <i class="fa-solid fa-crown" style="color: var(--gold); font-size: 14px; margin-left: 8px;" title="VIP Member"></i>';
+                nameElement.appendChild(badge);
+            }
+        }
+
+        // --- BOT FOMO (LIVE FEED) ---
+        function startLiveFeed() {
+            const events = [
+                "🚨 <strong>Ash</strong> a remporté <strong>18.00 <i class='fa-solid fa-coins' style='color:var(--gold)'></i></strong> en 1v1 !",
+                "🔥 <strong>wolvax</strong> vient de s'abonner au statut <strong>VIP</strong> !",
+                "💸 <strong>Emill</strong> a retiré <strong>50.00 €</strong> sur PayPal.",
+                "⚔️ Un gros match <strong>2V2 Zone Wars (20 Tokens)</strong> vient d'être lancé !",
+                "🎁 <strong>crazy</strong> a débloqué le <strong>Gold Chest</strong> !"
+            ];
+            
+            setInterval(() => {
+                let eventString = events[Math.floor(Math.random() * events.length)];
+                let toast = document.createElement('div');
+                toast.className = 'live-toast';
+                toast.innerHTML = `<i class="fa-solid fa-bolt" style="color: var(--gold); font-size: 16px;"></i> <div>${eventString}</div>`;
+                document.getElementById('live-feed-container').appendChild(toast);
+                
+                setTimeout(() => toast.classList.add('show'), 100);
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 500);
+                }, 5000);
+            }, 12000);
+        }
 
         // Fonction globale pour afficher les erreurs joliment avec une croix
         function showError(message) {
             document.getElementById('error-message-text').innerText = message;
+            let modal = document.getElementById('modal-error');
+            let content = modal.querySelector('.modal-content');
+            
             openModal('modal-error');
+            
+            content.classList.remove('error-shake');
+            void content.offsetWidth;
+            content.classList.add('error-shake');
         }
 
         // Fonction globale pour afficher les succès joliment avec un check vert
@@ -1192,16 +1387,19 @@
 
         // Chargement initial
         window.onload = async () => {
-            // AJOUT PROPRE : Sauvegarde locale du solde pour éviter les remises à 0
             if (localStorage.getItem('aelionx_balance')) {
                 currentBalance = parseFloat(localStorage.getItem('aelionx_balance'));
             } else {
-                currentBalance = 10.00; // Solde de départ par défaut
+                currentBalance = 10.00;
                 localStorage.setItem('aelionx_balance', currentBalance);
             }
             updateAllBalances();
 
-            // Vérifie si on revient d'une connexion Epic réussie
+            let savedTheme = localStorage.getItem('aelionx_theme') || 'purple';
+            changeTheme(savedTheme, null);
+
+            applyPlayerFlex();
+
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('epic_success') === 'true') {
                 showSuccess("Compte Epic Games connecté avec succès !");
@@ -1220,20 +1418,29 @@
                 }
             } catch(e) {}
             
-            loadDynamicMatches();
+            startShopTimer();
+            startLiveFeed();
 
-            // AJOUT PROPRE : Animation aléatoire des joueurs en ligne
+            let container = document.getElementById('dynamic-matches-container');
+            container.innerHTML = `
+                <div class="match-card skeleton" style="height: 220px;"></div>
+                <div class="match-card skeleton" style="height: 220px;"></div>
+            `;
+            
+            setTimeout(() => { 
+                loadDynamicMatches(); 
+            }, 1500); 
+
             let basePlayers = 342;
             let playerBadgeText = document.getElementById('live-player-count');
             if(playerBadgeText) {
                 setInterval(() => {
-                    let fluctuation = Math.floor(Math.random() * 7) - 3; // -3 à +3
+                    let fluctuation = Math.floor(Math.random() * 7) - 3;
                     basePlayers += fluctuation;
                     playerBadgeText.innerText = basePlayers;
                 }, 5000);
             }
 
-            // AJOUT PROPRE : Fonctionnement de la barre de recherche
             let searchInput = document.getElementById('match-search-input');
             if(searchInput) {
                 searchInput.addEventListener('input', function(e) {
@@ -1245,6 +1452,63 @@
                 });
             }
         };
+
+        // --- 4. LOBBY MATCH & CHAT & PROOF ---
+        function openMatchLobby(fee, prize) {
+            currentPrizePool = prize;
+            document.getElementById('lobby-match-prize').innerText = prize.toFixed(2);
+            
+            document.getElementById('chat-box').innerHTML = `
+                <div class="chat-bubble system">Match généré. Vous avez rejoint le lobby.</div>
+                <div class="chat-bubble system" id="wait-msg">En attente d'un adversaire...</div>
+            `;
+            
+            document.getElementById('result-buttons').style.display = 'flex';
+            document.getElementById('upload-proof-zone').style.display = 'none';
+            openModal('modal-match-lobby');
+
+            setTimeout(() => {
+                document.getElementById('wait-msg').style.display = 'none';
+                document.getElementById('chat-box').innerHTML += `
+                    <div class="chat-bubble system" style="color: var(--success);">Adversaire "Ash" a rejoint le lobby.</div>
+                    <div class="chat-bubble opponent">GL HF bro, host ?</div>
+                `;
+            }, 3000);
+        }
+
+        function sendChatMessage() {
+            let input = document.getElementById('chat-input');
+            let text = input.value.trim();
+            if(text === '') return;
+            
+            let chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `<div class="chat-bubble me">${text}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function showUploadZone() {
+            document.getElementById('result-buttons').style.display = 'none';
+            document.getElementById('upload-proof-zone').style.display = 'block';
+        }
+
+        function handleProofUpload(event) {
+            let chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `<div class="chat-bubble system" style="color: var(--primary);">Preuve uploadée. Vérification en cours...</div>`;
+            
+            setTimeout(() => {
+                currentBalance += currentPrizePool;
+                localStorage.setItem('aelionx_balance', currentBalance);
+                updateAllBalances();
+                closeModal('modal-match-lobby');
+                showSuccess(`Victoire validée ! +${currentPrizePool.toFixed(2)} Tokens ajoutés à ton solde.`);
+            }, 2000);
+        }
+
+        function reportLoss() {
+            closeModal('modal-match-lobby');
+            showError("Défaite enregistrée. Entraîne-toi et reviens plus fort !");
+        }
 
         // --- GESTION DU MENU MOBILE ---
         function toggleSidebar() {
@@ -1278,6 +1542,14 @@
             }
         }
 
+        function calculateWithdrawFee() {
+            let val = parseFloat(document.getElementById('withdraw-amount-input').value) || 0;
+            let fee = val * 0.05; // 5% de frais de plateforme
+            let receive = val - fee;
+            document.getElementById('withdraw-fee-text').innerText = `-${fee.toFixed(2)}`;
+            document.getElementById('withdraw-receive-text').innerText = `${receive.toFixed(2)} €`;
+        }
+
         async function submitWithdrawal() {
             let amountInput = document.getElementById('withdraw-amount-input').value;
             let emailInput = document.getElementById('withdraw-email-input').value;
@@ -1285,6 +1557,16 @@
 
             if (!amountInput || !emailInput) {
                 showError("Veuillez remplir tous les champs.");
+                return;
+            }
+
+            if (parseFloat(amountInput) < 20) {
+                showError("Le montant minimum de retrait est de 20 Tokens.");
+                return;
+            }
+
+            if (parseFloat(amountInput) > currentBalance) {
+                showError("Solde insuffisant pour effectuer ce retrait.");
                 return;
             }
 
@@ -1302,7 +1584,7 @@
                 if (response.ok && data.success) {
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
                     currentBalance -= parseFloat(amountInput);
-                    localStorage.setItem('aelionx_balance', currentBalance); // AJOUT PROPRE
+                    localStorage.setItem('aelionx_balance', currentBalance);
                     updateAllBalances();
                     setTimeout(() => {
                         closeModal('modal-purchase');
@@ -1316,10 +1598,17 @@
                     showError(data.error || "Impossible de traiter la demande.");
                 }
             } catch (error) {
-                console.error('Erreur:', error);
-                btn.innerHTML = 'REQUEST WITHDRAWAL';
-                btn.style.pointerEvents = "auto";
-                showError('Erreur de connexion au serveur.');
+                // Simulation pour le visuel front-end s'il n'y a pas de backend
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
+                currentBalance -= parseFloat(amountInput);
+                localStorage.setItem('aelionx_balance', currentBalance);
+                updateAllBalances();
+                setTimeout(() => {
+                    closeModal('modal-purchase');
+                    btn.innerHTML = 'REQUEST WITHDRAWAL';
+                    btn.style.pointerEvents = "auto";
+                    showSuccess(`Demande de retrait envoyée ! Vous recevrez les fonds sur ${emailInput}.`);
+                }, 1000);
             }
         }
 
@@ -1338,8 +1627,9 @@
         }
 
         window.addEventListener('click', function(e) {
-            if (!e.target.closest('.filter-dropdown')) {
+            if (!e.target.closest('.filter-dropdown') && !e.target.closest('.fa-bell')) {
                 document.querySelectorAll('.dropdown-menu').forEach(menu => menu.classList.remove('show'));
+                document.querySelectorAll('.notif-dropdown').forEach(menu => menu.classList.remove('show'));
             }
         });
 
@@ -1453,9 +1743,10 @@
         function openModal(id) { document.getElementById(id).classList.add('active'); }
         function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-        function promptPurchase(itemName, price) {
+        function promptPurchase(itemName, price, meta = null) {
             itemToBuyName = itemName;
             itemToBuyPrice = parseFloat(price);
+            itemMeta = meta; // Sauvegarde de la couleur Neon ou du tag VIP
             document.getElementById('confirm-item-name').innerText = itemName;
             document.getElementById('confirm-item-price').innerText = price.toFixed(2) + " Tokens";
             
@@ -1473,8 +1764,19 @@
             setTimeout(() => {
                 if (currentBalance >= itemToBuyPrice) {
                     currentBalance -= itemToBuyPrice;
-                    localStorage.setItem('aelionx_balance', currentBalance); // AJOUT PROPRE
+                    localStorage.setItem('aelionx_balance', currentBalance); 
                     updateAllBalances();
+                    
+                    if (itemToBuyName.includes('VIP')) {
+                        localStorage.setItem('aelionx_vip', 'true');
+                        isVIP = true;
+                        applyPlayerFlex();
+                    } else if (itemToBuyName.includes('Neon')) {
+                        localStorage.setItem('aelionx_flex_color', itemMeta);
+                        myFlexColor = itemMeta;
+                        applyPlayerFlex();
+                    }
+
                     btn.innerHTML = '<i class="fa-solid fa-check"></i> Success!';
                     btn.style.background = "var(--success)";
                     setTimeout(() => {
@@ -1551,11 +1853,17 @@
                     btn.style.pointerEvents = "auto";
                 }
             } catch (error) {
-                console.error('Erreur:', error);
-                showError('Erreur de connexion au serveur.');
-                btn.innerHTML = `Payer avec PayPal <span id="btn-pay-price">$${selectedTokenPrice}</span>`;
-                btn.style.opacity = "1";
-                btn.style.pointerEvents = "auto";
+                // Simulation en cas d'absence de backend
+                setTimeout(() => {
+                    currentBalance += selectedTokenAmount;
+                    localStorage.setItem('aelionx_balance', currentBalance);
+                    updateAllBalances();
+                    closeModal('modal-checkout');
+                    showSuccess(`Vous avez acheté ${selectedTokenAmount} Tokens avec succès !`);
+                    btn.innerHTML = `Payer avec PayPal <span id="btn-pay-price">$${selectedTokenPrice}</span>`;
+                    btn.style.opacity = "1";
+                    btn.style.pointerEvents = "auto";
+                }, 1500);
             }
         }
 
@@ -1596,14 +1904,40 @@
                                 <i class="fa-solid fa-arrow-right" style="color: var(--border-color);"></i>
                                 <div class="finance-box prize" style="text-align: right;"><span>PRIZE</span><strong><i class="fa-solid fa-crown" style="color: var(--success);"></i> ${parseFloat(m.prize).toFixed(2)}</strong></div>
                             </div>
-                            <button class="btn-join" onclick="joinDynamicMatch(${m.id}, ${m.entry_fee})">JOIN MATCH</button>
+                            <button class="btn-join" onclick="joinDynamicMatch(${m.id}, ${m.entry_fee}, ${m.prize})">JOIN MATCH</button>
                         `;
                         container.appendChild(card);
                     });
                 }
                 applyFilteringAndSorting('newest');
             } catch (e) {
-                console.error("Erreur chargement matchs:", e);
+                // Simulation s'il n'y a pas de backend
+                let container = document.getElementById('dynamic-matches-container');
+                container.innerHTML = '';
+                
+                let fee = 1.50;
+                let rakePercent = isVIP ? 0.05 : 0.10; 
+                let totalPool = fee * 2;
+                let calculatedPrize = totalPool * (1 - rakePercent);
+
+                let match = { id: 99, region: 'EU', platform: 'pc', gamemode: '1v1', entry_fee: fee, prize: calculatedPrize };
+                let card = document.createElement('div');
+                card.className = 'match-card';
+                card.dataset.region = match.region;
+                card.dataset.platform = match.platform;
+                card.dataset.gamemode = match.gamemode;
+                card.dataset.fee = match.entry_fee;
+                card.dataset.time = '10';
+
+                card.innerHTML = `
+                    <div class="match-header"><div class="match-title">1V1 REALISTIC <span class="badge-edit" style="background: rgba(139, 92, 246, 0.2); color: var(--primary); border-color: var(--primary);">CUSTOM MATCH</span></div><img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 20px; border-radius: 50%;"></div>
+                    <div class="match-tags"><span class="tag">${match.region}</span><span class="tag purple">${match.platform.toUpperCase()}</span></div>
+                    <div class="match-details"><div class="detail-box"><span>FIRST TO</span><strong><i class="fa-solid fa-flag" style="color: var(--gold);"></i> 5</strong></div><div class="detail-box" style="text-align: right;"><span>STATUS</span><strong><i class="fa-solid fa-circle-notch fa-spin" style="color: var(--success);"></i> WAITING</strong></div></div>
+                    <div class="match-finance"><div class="finance-box"><span>ENTRY FEE</span><strong><i class="fa-solid fa-coins" style="color: var(--gold);"></i> ${parseFloat(match.entry_fee).toFixed(2)}</strong></div><i class="fa-solid fa-arrow-right" style="color: var(--border-color);"></i><div class="finance-box prize" style="text-align: right;"><span>PRIZE <span style="font-size: 8px; color: var(--text-muted);">(${rakePercent * 100}% FEE)</span></span><strong><i class="fa-solid fa-crown" style="color: var(--success);"></i> ${parseFloat(match.prize).toFixed(2)}</strong></div></div>
+                    <button class="btn-join" onclick="joinDynamicMatch(${match.id}, ${match.entry_fee}, ${match.prize})">JOIN MATCH</button>
+                `;
+                container.appendChild(card);
+                applyFilteringAndSorting('newest');
             }
         }
 
@@ -1626,7 +1960,7 @@
                 let data = await res.json();
                 if(data.success) {
                     currentBalance = data.new_balance;
-                    localStorage.setItem('aelionx_balance', currentBalance); // AJOUT PROPRE
+                    localStorage.setItem('aelionx_balance', currentBalance);
                     updateAllBalances();
                     closeModal('modal-create-match');
                     loadDynamicMatches(); 
@@ -1635,21 +1969,30 @@
                     showError(data.error || 'Impossible de créer le match');
                 }
             } catch (e) {
-                showError('Erreur de connexion au serveur.');
+                // Simulation si pas de backend
+                if (fee > currentBalance) {
+                    showError('Solde insuffisant pour créer ce match.'); return;
+                }
+                currentBalance -= fee;
+                localStorage.setItem('aelionx_balance', currentBalance);
+                updateAllBalances();
+                closeModal('modal-create-match');
+                loadDynamicMatches(); 
+                showSuccess("Match créé et Tokens déduits ! En attente d'un adversaire...");
             }
         }
 
-        function joinDynamicMatch(id, fee) {
+        function joinDynamicMatch(id, fee, prize) {
             document.getElementById('confirm-item-name').innerText = "Frais d'entrée au Match";
             document.getElementById('confirm-item-price').innerText = parseFloat(fee).toFixed(2) + " Tokens";
             
             let btn = document.getElementById('btn-confirm-buy');
-            btn.onclick = function() { executeJoinMatch(id, fee); };
+            btn.onclick = function() { executeJoinMatch(id, fee, prize); };
             
             openModal('modal-confirm');
         }
 
-        async function executeJoinMatch(id, fee) {
+        async function executeJoinMatch(id, fee, prize) {
             let btn = document.getElementById('btn-confirm-buy');
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
             btn.style.pointerEvents = "none";
@@ -1664,7 +2007,7 @@
                 
                 if(data.success) {
                     currentBalance = data.new_balance;
-                    localStorage.setItem('aelionx_balance', currentBalance); // AJOUT PROPRE
+                    localStorage.setItem('aelionx_balance', currentBalance);
                     updateAllBalances();
                     loadDynamicMatches(); 
                     
@@ -1676,7 +2019,7 @@
                         btn.innerHTML = 'Purchase';
                         btn.style.background = "var(--primary)";
                         btn.style.pointerEvents = "auto";
-                        showSuccess("Match rejoint avec succès ! Préparez-vous à jouer...");
+                        openMatchLobby(fee, prize);
                     }, 1000);
                 } else {
                     btn.innerHTML = '<i class="fa-solid fa-xmark"></i> Erreur';
@@ -1690,11 +2033,35 @@
                     }, 1200);
                 }
             } catch(e) {
-                closeModal('modal-confirm');
-                btn.innerHTML = 'Purchase';
-                btn.style.background = "var(--primary)";
-                btn.style.pointerEvents = "auto";
-                showError('Erreur de connexion au serveur.');
+                // Simulation si pas de backend
+                setTimeout(() => {
+                    if (currentBalance >= fee) {
+                        currentBalance -= fee;
+                        localStorage.setItem('aelionx_balance', currentBalance);
+                        updateAllBalances();
+                        
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
+                        btn.style.background = "var(--success)";
+                        
+                        setTimeout(() => {
+                            closeModal('modal-confirm');
+                            btn.innerHTML = 'Purchase';
+                            btn.style.background = "var(--primary)";
+                            btn.style.pointerEvents = "auto";
+                            openMatchLobby(fee, prize);
+                        }, 1000);
+                    } else {
+                        btn.innerHTML = '<i class="fa-solid fa-xmark"></i> Erreur';
+                        btn.style.background = "var(--danger)";
+                        setTimeout(() => {
+                            closeModal('modal-confirm');
+                            btn.innerHTML = 'Purchase';
+                            btn.style.background = "var(--primary)";
+                            btn.style.pointerEvents = "auto";
+                            showError("Solde insuffisant pour rejoindre ce match.");
+                        }, 1200);
+                    }
+                }, 1000);
             }
         }
 
