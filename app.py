@@ -10,27 +10,19 @@ app.secret_key = "9664c42e441bbd49bdc5ac31dc550bead16d49bffb395e5e185e2f72085a63
 # ================= CONFIGURATION =================
 DOMAIN_URL = "https://aelionx.onrender.com" 
 
-# 1. DISCORD OAUTH2
-DISCORD_CLIENT_ID = "1531436256129450124"
-DISCORD_CLIENT_SECRET = "0gJTf_NObmpCY6aaCnptq6RnDO8uuK7t3"
-DISCORD_REDIRECT_URI = f"{DOMAIN_URL}/callback"
-
-# 2. PAYPAL API
+# PAYPAL API
 PAYPAL_CLIENT_ID = "AZnJoA4KhCvofBX4gnAEoszq7U8WMPZaFCvuxNBP0f6iEWKhBT19d71tewTNJ4mZhsBjkGtWuBSV5n0G"
 PAYPAL_SECRET = "EF5L9PIRmbiP2QkwmXQOfj5js4hE52zPCPdCUXf0mXFA43rgIo10ahOhQ-qcNPNU4ejsQRgF8uEJiH5i"
-PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com" # Remplace par https://api-m.paypal.com pour le mode réel
+PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com" # Remplace par api-m.paypal.com en réel
 
 # ================= BASE DE DONNÉES =================
 def init_db():
     conn = sqlite3.connect('aelionx.db')
     c = conn.cursor()
-    # Table des utilisateurs
     c.execute('''CREATE TABLE IF NOT EXISTS users 
                  (user_id TEXT PRIMARY KEY, tokens REAL, elo INTEGER, wins INTEGER DEFAULT 0, losses INTEGER DEFAULT 0, epic_id TEXT)''')
-    # Table des demandes de retrait
     c.execute('''CREATE TABLE IF NOT EXISTS withdrawals 
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id TEXT, amount REAL, paypal_email TEXT, status TEXT DEFAULT 'PENDING')''')
-    # Table des matchs créés par les joueurs
     c.execute('''CREATE TABLE IF NOT EXISTS matches 
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, creator_id TEXT, region TEXT, platform TEXT, gamemode TEXT, entry_fee REAL, prize REAL, status TEXT DEFAULT 'WAITING')''')
     conn.commit()
@@ -42,9 +34,9 @@ def get_user(user_id):
     c.execute("SELECT * FROM users WHERE user_id = ?", (user_id,))
     user = c.fetchone()
     if not user:
-        c.execute("INSERT OR IGNORE INTO users (user_id, tokens, elo, wins, losses, epic_id) VALUES (?, ?, ?, ?, ?, ?)", (user_id, 0.0, 0, 0, 0, None))
+        c.execute("INSERT OR IGNORE INTO users (user_id, tokens, elo, wins, losses, epic_id) VALUES (?, ?, ?, ?, ?, ?)", (user_id, 0.0, 0, 0, 0, user_id))
         conn.commit()
-        user = (user_id, 0.0, 0, 0, 0, None)
+        user = (user_id, 0.0, 0, 0, 0, user_id)
     conn.close()
     return user
 
@@ -65,35 +57,6 @@ def home():
 def serve_file(filename):
     return send_from_directory('.', filename)
 
-# --- 1. CONNEXION & UTILISATEUR ---
-@app.route('/login')
-def login():
-    discord_auth_url = f"https://discord.com/api/oauth2/authorize?client_id={DISCORD_CLIENT_ID}&redirect_uri={DISCORD_REDIRECT_URI}&response_type=code&scope=identify"
-    return redirect(discord_auth_url)
-
-@app.route('/callback')
-def callback():
-    code = request.args.get('code')
-    data = {
-        'client_id': DISCORD_CLIENT_ID,
-        'client_secret': DISCORD_CLIENT_SECRET,
-        'grant_type': 'authorization_code',
-        'code': code,
-        'redirect_uri': DISCORD_REDIRECT_URI
-    }
-    headers = {'Content-Type': 'application/x-www-form-urlencoded'}
-    r = requests.post('https://discord.com/api/oauth2/token', data=data, headers=headers)
-    token_info = r.json()
-    
-    headers = {'Authorization': f"Bearer {token_info.get('access_token')}"}
-    user_info = requests.get('https://discord.com/api/users/@me', headers=headers).json()
-    
-    session['user_id'] = user_info['id']
-    session['username'] = user_info['username']
-    
-    get_user(user_info['id'])
-    return redirect('/')
-
 @app.route('/api/me')
 def api_me():
     if 'user_id' in session:
@@ -101,27 +64,26 @@ def api_me():
         return jsonify({"logged_in": True, "balance": user[1], "username": session['username']})
     return jsonify({"logged_in": False})
 
-# --- 2. LIAISON EPIC GAMES ---
+# --- 1. CONNEXION VIA EPIC GAMES SEULEMENT ---
 @app.route('/api/link/epic', methods=['POST'])
 @app.route('/link/epic', methods=['POST'])
 def link_epic():
     try:
-        if 'user_id' not in session: return jsonify({"error": "Non connecté à Discord"}), 403
         req_data = request.get_json(silent=True) or {}
         epic_id = req_data.get('epic_id')
         if not epic_id: return jsonify({"error": "Pseudo Epic manquant"}), 400
             
-        user_id = session['user_id']
-        conn = sqlite3.connect('aelionx.db')
-        c = conn.cursor()
-        c.execute("UPDATE users SET epic_id = ? WHERE user_id = ?", (epic_id, user_id))
-        conn.commit()
-        conn.close()
-        return jsonify({"success": True, "message": f"Compte Epic lié avec succès !"})
+        # L'ID Epic devient la connexion principale du joueur
+        session['user_id'] = epic_id
+        session['username'] = epic_id
+        
+        get_user(epic_id) # Crée le profil s'il n'existe pas
+        
+        return jsonify({"success": True, "message": f"Connecté en tant que {epic_id} avec succès !"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# --- 3. SYSTEME DE MATCHS (CRÉER / REJOINDRE) ---
+# --- 2. MATCHS ---
 @app.route('/api/matches', methods=['GET'])
 def get_matches():
     conn = sqlite3.connect('aelionx.db')
@@ -134,7 +96,7 @@ def get_matches():
 
 @app.route('/api/matches/create', methods=['POST'])
 def create_match():
-    if 'user_id' not in session: return jsonify({"error": "Connectez-vous à Discord"}), 403
+    if 'user_id' not in session: return jsonify({"error": "Veuillez lier votre compte Epic Games d'abord."}), 403
     req = request.get_json(silent=True) or {}
     fee = float(req.get('entry_fee', 0))
     if fee <= 0: return jsonify({"error": "Mise invalide"}), 400
@@ -143,8 +105,7 @@ def create_match():
     user = get_user(user_id)
     if user[1] < fee: return jsonify({"error": "Fonds insuffisants sur le compte."}), 400
     
-    prize = fee * 1.9 # Commission du site (ex: 2 joueurs mettent 5, le total est 10, le gagnant gagne 9.5)
-    
+    prize = fee * 1.9 
     add_tokens(user_id, -fee)
     new_user_data = get_user(user_id)
     
@@ -158,7 +119,7 @@ def create_match():
 
 @app.route('/api/matches/join', methods=['POST'])
 def join_match():
-    if 'user_id' not in session: return jsonify({"error": "Connectez-vous à Discord"}), 403
+    if 'user_id' not in session: return jsonify({"error": "Veuillez lier votre compte Epic Games d'abord."}), 403
     req = request.get_json(silent=True) or {}
     match_id = req.get('match_id')
     user_id = session['user_id']
@@ -190,10 +151,10 @@ def join_match():
     conn.close()
     return jsonify({"success": True, "new_balance": new_user_data[1]})
 
-# --- 4. RETRAIT D'ARGENT ---
+# --- 3. RETRAITS ---
 @app.route('/api/withdraw', methods=['POST'])
 def withdraw():
-    if 'user_id' not in session: return jsonify({"error": "Connectez-vous à Discord"}), 403
+    if 'user_id' not in session: return jsonify({"error": "Veuillez lier votre compte Epic Games d'abord."}), 403
     req_data = request.get_json(silent=True) or {}
     amount = float(req_data.get('amount', 0))
     paypal_email = req_data.get('email', '')
@@ -215,7 +176,7 @@ def withdraw():
     conn.close()
     return jsonify({"success": True, "message": f"Retrait de ${amount} demandé !", "new_balance": new_user_data[1]})
 
-# --- 5. PAIEMENT PAYPAL ---
+# --- 4. PAYPAL ---
 def get_paypal_token():
     auth = base64.b64encode(f"{PAYPAL_CLIENT_ID}:{PAYPAL_SECRET}".encode()).decode()
     headers = {"Authorization": f"Basic {auth}", "Content-Type": "application/x-www-form-urlencoded"}
@@ -225,7 +186,7 @@ def get_paypal_token():
 @app.route('/pay/create', methods=['POST'])
 def create_payment():
     try:
-        if 'user_id' not in session: return jsonify({"error": "Connectez-vous à Discord"}), 403
+        if 'user_id' not in session: return jsonify({"error": "Veuillez lier votre compte Epic Games d'abord."}), 403
         req_data = request.get_json(silent=True) or {}
         amount = req_data.get('amount', 10.0)
         token = get_paypal_token()
