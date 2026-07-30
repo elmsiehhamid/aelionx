@@ -790,6 +790,21 @@
                 <div class="page-tab" style="flex: 1; text-align: center;" onclick="clickShopTab(this, 'upgrades')">Match Upgrades</div>
             </div>
 
+            <!-- CODE CRÉATEUR BANNER -->
+            <div style="background: linear-gradient(135deg, var(--bg-card), var(--bg-sidebar)); border: 1px solid var(--primary); border-radius: 12px; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); flex-wrap: wrap; gap: 15px;">
+                <div>
+                    <h4 style="font-size: 20px; color: white; display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                        <i class="fa-solid fa-heart" style="color: #ef4444;"></i> Soutenir le Clan
+                    </h4>
+                    <p style="color: var(--text-muted); font-size: 13px;">Entrez notre code dans la boutique pour nous soutenir !</p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 8px; border: 1px dashed var(--border-color);">
+                    <span style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Code Créateur</span>
+                    <strong style="font-size: 24px; color: var(--gold); letter-spacing: 2px;">AELIONX</strong>
+                    <button onclick="copyCreatorCode()" style="background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 10px; transition: 0.2s;"><i class="fa-regular fa-copy"></i> Copier</button>
+                </div>
+            </div>
+
             <div class="shop-banners">
                 <div class="banner elite" onclick="promptPurchase('Elite Pass Season 1', 8.00)">
                     <div>
@@ -1097,6 +1112,19 @@
                     <div style="font-size: 20px; font-weight: bold; color: white;">24</div>
                 </div>
             </div>
+
+            <!-- ARMURERIE / SETUP PC INJECTÉE ICI -->
+            <div style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); text-align: left; margin-bottom: 25px; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.05;"><i class="fa-solid fa-microchip"></i></div>
+                <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; font-weight: bold;"><i class="fa-solid fa-server" style="color: var(--primary);"></i> Setup & Hardware</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
+                    <div><span style="color: var(--text-muted);">CPU:</span> <strong>Intel Core i5</strong></div>
+                    <div><span style="color: var(--text-muted);">MB:</span> <strong>ROG Strix B550-A</strong></div>
+                    <div><span style="color: var(--text-muted);">Audio:</span> <strong>Ampli Tubes & DAC</strong></div>
+                    <div><span style="color: var(--text-muted);">Ping:</span> <strong style="color: var(--success);">12ms</strong></div>
+                </div>
+            </div>
+
             <button class="btn-full-gold" onclick="closeModal('modal-profile')" style="background: var(--bg-card); color: white; border: 1px solid var(--border-color);">Close</button>
         </div>
     </div>
@@ -1508,6 +1536,12 @@
         function reportLoss() {
             closeModal('modal-match-lobby');
             showError("Défaite enregistrée. Entraîne-toi et reviens plus fort !");
+        }
+
+        // --- NOUVELLE FONCTION COPIER LE CODE CRÉATEUR ---
+        function copyCreatorCode() {
+            navigator.clipboard.writeText("AELIONX");
+            showSuccess("Code AELIONX copié dans le presse-papier ! Merci du soutien 💜");
         }
 
         // --- GESTION DU MENU MOBILE ---
@@ -2069,6 +2103,28 @@
             if (event.target.classList.contains('modal-overlay')) {
                 event.target.classList.remove('active');
             }
+        }
+        
+        function startShopTimer() {
+            function updateTimer() {
+                const now = new Date();
+                const resetTime = new Date(now);
+                resetTime.setUTCHours(24, 0, 0, 0); 
+                
+                let diff = resetTime - now;
+                if (diff < 0) diff += 24 * 60 * 60 * 1000;
+                
+                const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                const minutes = Math.floor((diff / 1000 / 60) % 60);
+                const seconds = Math.floor((diff / 1000) % 60);
+                
+                const display = document.getElementById('shop-timer');
+                if(display) {
+                    display.innerText = `${hours.toString().padStart(2, '0')} : ${minutes.toString().padStart(2, '0')} : ${seconds.toString().padStart(2, '0')}`;
+                }
+            }
+            setInterval(updateTimer, 1000);
+            updateTimer();
         }
     </script>
 </body>
