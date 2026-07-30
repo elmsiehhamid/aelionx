@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ÆLIONX | Competitive Hub</title>
-    <!-- Logo personnalisé pour l'onglet du navigateur -->
     <link rel="icon" type="image/jpeg" href="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,7 +15,7 @@
             --bg-card: #15151a;
             --bg-card-hover: #1a1a21;
             --border-color: #27272a;
-            --primary: #8b5cf6; /* Violet ÆLIONX */
+            --primary: #8b5cf6; 
             --primary-dark: #5b21b6;
             --primary-glow: rgba(139, 92, 246, 0.4);
             --gold: #fbbf24;
@@ -38,13 +37,11 @@
             overflow: hidden;
         }
 
-        /* --- CUSTOM SCROLLBAR --- */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: var(--bg-main); }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        /* --- ANIMATIONS "GAMING" --- */
         @keyframes float {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-12px); }
@@ -57,7 +54,6 @@
             100% { filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.4)); }
         }
 
-        /* Animation de secousse pour les erreurs */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -66,7 +62,6 @@
         }
         .error-shake { animation: shake 0.4s ease-in-out; }
 
-        /* Skeletons Loaders (chargement) */
         @keyframes shimmer {
             0% { background-position: -400px 0; }
             100% { background-position: 400px 0; }
@@ -80,16 +75,13 @@
         }
         .skeleton * { visibility: hidden; }
 
-        /* --- FOMO LIVE FEED TOASTS --- */
         .live-feed-container { position: fixed; bottom: 20px; left: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
         .live-toast { background: rgba(21, 21, 26, 0.95); border-left: 4px solid var(--gold); padding: 12px 20px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 12px; transform: translateX(-150%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s; opacity: 0; font-size: 13px; backdrop-filter: blur(5px); border: 1px solid var(--border-color); border-left: 4px solid var(--gold); }
         .live-toast.show { transform: translateX(0); opacity: 1; pointer-events: auto; }
 
-        /* --- RANK XP BAR --- */
         .xp-bar-container { width: 100%; background: var(--bg-main); height: 10px; border-radius: 10px; overflow: hidden; margin-top: 5px; border: 1px solid var(--border-color); }
         .xp-bar-fill { height: 100%; background: linear-gradient(90deg, var(--gold), #fef08a); width: 75%; border-radius: 10px; box-shadow: 0 0 10px var(--gold); }
 
-        /* --- LOBBY CHAT --- */
         .chat-container { background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; height: 200px; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .chat-bubble { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 13px; }
         .chat-bubble.system { align-self: center; background: rgba(255,255,255,0.05); color: var(--text-muted); font-size: 11px; text-transform: uppercase; }
@@ -97,6 +89,51 @@
         .chat-bubble.opponent { align-self: flex-start; background: var(--bg-card); border: 1px solid var(--border-color); color: white; border-bottom-left-radius: 2px; }
         .upload-zone { border: 2px dashed var(--border-color); padding: 20px; border-radius: 8px; text-align: center; cursor: pointer; transition: 0.3s; background: var(--bg-main); display: block; margin-top: 15px; }
         .upload-zone:hover { border-color: var(--primary); background: rgba(139, 92, 246, 0.05); }
+
+        /* --- NOUVEAU : TIKTOK CLIPS HUB --- */
+        .tiktok-wrapper { height: calc(100vh - 70px); width: 100%; overflow-y: scroll; scroll-snap-type: y mandatory; padding: 0; margin: 0; background: #000; }
+        .tiktok-slide { height: calc(100vh - 70px); width: 100%; scroll-snap-align: start; position: relative; display: flex; justify-content: center; align-items: center; background-size: cover; background-position: center; border-bottom: 1px solid var(--border-color); }
+        .tiktok-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%, rgba(0,0,0,0.4) 100%); pointer-events: none; }
+        .tiktok-ui-right { position: absolute; right: 20px; bottom: 80px; display: flex; flex-direction: column; gap: 20px; align-items: center; z-index: 10; }
+        .tiktok-btn { background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); width: 50px; height: 50px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; cursor: pointer; transition: 0.2s; }
+        .tiktok-btn:hover { background: var(--primary); border-color: var(--primary); transform: scale(1.1); }
+        .tiktok-btn i { font-size: 20px; }
+        .tiktok-btn span { font-size: 10px; font-weight: bold; margin-top: 2px; }
+        .tiktok-info { position: absolute; left: 40px; bottom: 40px; z-index: 10; width: calc(100% - 120px); }
+        .tiktok-info h3 { font-size: 24px; font-weight: 800; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
+        .tiktok-info p { font-size: 14px; color: #ddd; margin-bottom: 15px; text-shadow: 0 1px 5px rgba(0,0,0,0.8); }
+        .tiktok-challenge-btn { background: var(--danger); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; font-family: 'Poppins'; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); transition: 0.2s; }
+        .tiktok-challenge-btn:hover { background: #b91c1c; transform: translateY(-2px); }
+
+        /* --- NOUVEAU : RADAR COMMAND CENTER --- */
+        .radar-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; height: 100%; align-items: center; }
+        .radar-box { position: relative; width: 100%; max-width: 450px; aspect-ratio: 1/1; margin: 0 auto; border-radius: 50%; border: 2px solid rgba(139, 92, 246, 0.3); background: radial-gradient(circle, rgba(139, 92, 246, 0.05) 0%, transparent 70%); box-shadow: 0 0 50px rgba(139, 92, 246, 0.1) inset, 0 0 20px rgba(139, 92, 246, 0.2); overflow: hidden; }
+        .radar-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-image: linear-gradient(rgba(139, 92, 246, 0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(139, 92, 246, 0.2) 1px, transparent 1px); background-size: 20px 20px; background-position: center center; border: 1px solid rgba(139,92,246,0.5); }
+        .radar-grid::before { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: rgba(139, 92, 246, 0.5); }
+        .radar-grid::after { content: ''; position: absolute; top: 0; left: 50%; width: 1px; height: 100%; background: rgba(139, 92, 246, 0.5); }
+        .radar-circles { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 66%; height: 66%; border-radius: 50%; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .radar-circles::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50%; height: 50%; border-radius: 50%; border: 1px solid rgba(139, 92, 246, 0.3); }
+        
+        @keyframes scan { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .radar-scanner { position: absolute; top: 50%; left: 50%; width: 50%; height: 50%; transform-origin: 0 0; background: conic-gradient(from 0deg, transparent 70%, rgba(139, 92, 246, 0.8) 100%); animation: scan 3s linear infinite; z-index: 2; }
+        
+        .radar-dot { position: absolute; width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); z-index: 3; transform: translate(-50%, -50%); opacity: 0; }
+        @keyframes blip { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.5); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1); } }
+        .radar-dot.active { animation: blip 3s ease-out infinite; }
+
+        .comms-panel { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; height: 100%; max-height: 450px; display: flex; flex-direction: column; overflow: hidden; }
+        .comms-header { padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
+        .comms-header h4 { font-size: 16px; display: flex; align-items: center; gap: 10px; color: var(--text-main); }
+        .comms-list { flex: 1; overflow-y: auto; padding: 10px; }
+        .comm-item { display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 8px; transition: 0.2s; margin-bottom: 5px; background: rgba(255,255,255,0.02); border: 1px solid transparent; }
+        .comm-item:hover { background: rgba(139, 92, 246, 0.05); border-color: rgba(139, 92, 246, 0.3); }
+        .comm-avatar { position: relative; width: 35px; height: 35px; }
+        .comm-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+        .comm-avatar .status { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--bg-card); }
+        .status.online { background: var(--success); }
+        .status.dnd { background: var(--danger); }
+        .comm-info h5 { font-size: 14px; margin-bottom: 2px; }
+        .comm-info p { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
 
         /* --- SIDEBAR --- */
         .sidebar {
@@ -130,6 +167,8 @@
         }
         .nav-link:hover, .nav-link.active { color: var(--text-main); background: rgba(255, 255, 255, 0.05); border-left: 3px solid var(--primary); }
         .nav-link i { width: 20px; text-align: center; }
+        .nav-link .badge-red { background: var(--danger); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: auto; font-weight: bold; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
+        .nav-link .badge-pulse { background: var(--success); width: 8px; height: 8px; border-radius: 50%; margin-left: auto; box-shadow: 0 0 10px var(--success); animation: pulseGlow 2s infinite; }
 
         .buy-tokens-btn {
             margin: auto 20px 20px 20px; background: var(--gold); color: #000; border: none;
@@ -141,7 +180,6 @@
         /* --- MAIN CONTENT --- */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; position: relative; }
         
-        /* Watermark Logo Centré */
         .main-wrapper::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: url('121c09ad-fbff-41ae-b743-deb7acabb65e.jpg') center center/50% no-repeat; opacity: 0.04; pointer-events: none; z-index: 0;
@@ -163,7 +201,6 @@
         .avatar { width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary); cursor: pointer; transition: 0.2s; object-fit: cover;}
         .avatar:hover { box-shadow: 0 0 10px var(--primary); }
 
-        /* Menu déroulant pour la cloche des notifications */
         .notif-dropdown {
             display: none; position: absolute; top: 50px; right: 50px; width: 320px;
             background: var(--bg-sidebar); border: 1px solid var(--border-color);
@@ -178,6 +215,7 @@
         /* --- PAGES CONTAINERS --- */
         .page-section { display: none; padding: 40px; overflow-y: auto; height: calc(100vh - 70px); z-index: 1; position: relative; }
         .page-section.active { display: block; }
+        #highlights { padding: 0; } /* Supprime le padding pour le fullscreen Tiktok */
 
         .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; }
         .section-header h3 { font-size: 28px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
@@ -246,7 +284,6 @@
         .btn-join { width: 100%; background: transparent; color: var(--primary); border: 1px solid var(--primary); padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Poppins'; }
         .btn-join:hover { background: rgba(139, 92, 246, 0.1); box-shadow: 0 0 15px var(--primary-glow); }
 
-        /* BOUTON MATCH OCCUPÉ (ROUGE, INACTIF) */
         .btn-join.occupied { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: var(--danger); opacity: 0.8; cursor: not-allowed; }
         .btn-join.occupied:hover { box-shadow: none; background: rgba(239, 68, 68, 0.1); }
 
@@ -289,14 +326,7 @@
         .chest-card:hover { transform: translateY(-5px); }
         .chest-card.gold:hover { box-shadow: 0 10px 30px rgba(251, 191, 36, 0.15); border-color: var(--gold); }
         
-        .chest-card img { 
-            height: 120px; 
-            object-fit: contain; 
-            margin: 20px 0; 
-            filter: drop-shadow(0 0 15px rgba(255,255,255,0.05)); 
-            animation: float 3.5s ease-in-out infinite; 
-        }
-        
+        .chest-card img { height: 120px; object-fit: contain; margin: 20px 0; filter: drop-shadow(0 0 15px rgba(255,255,255,0.05)); animation: float 3.5s ease-in-out infinite; }
         .chest-card.gold img { animation: float 3s ease-in-out infinite, pulseGlow 4s infinite; }
 
         .chest-title { display: flex; justify-content: space-between; font-weight: 700; font-size: 18px; }
@@ -309,10 +339,8 @@
         .avatar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
         .avatar-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
         .avatar-card:hover { border-color: var(--gold); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        
         .avatar-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 8px; margin-bottom: 15px; transition: 0.3s; background: rgba(255,255,255,0.02); }
         .avatar-card:hover img { transform: scale(1.05); }
-        
         .avatar-card .id { font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: bold; }
         .avatar-card .price { font-size: 16px; font-weight: bold; color: white; display: flex; justify-content: center; align-items: center; gap: 5px; }
 
@@ -411,12 +439,12 @@
             .page-tab { flex: 1; text-align: center; padding: 10px; font-size: 12px; }
             .podium-container { transform: scale(0.70); transform-origin: top center; margin-top: 20px; height: 260px; }
             .modal-content { padding: 20px; width: 92%; max-width: 400px; }
+            .radar-dashboard { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <!-- LIVE FEED CONTAINER (FOMO) -->
     <div class="live-feed-container" id="live-feed-container"></div>
 
     <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -437,11 +465,17 @@
             <a onclick="switchPage('matches', this)" class="nav-link active"><i class="fa-solid fa-swords"></i> Matches</a>
             <a onclick="switchPage('leaderboard', this)" class="nav-link"><i class="fa-solid fa-trophy"></i> Tournaments</a>
             <a onclick="switchPage('leaderboard', this)" class="nav-link"><i class="fa-solid fa-chart-simple"></i> Leaderboard</a>
+            <a onclick="switchPage('radar', this)" class="nav-link"><i class="fa-solid fa-satellite-dish"></i> Radar <span class="badge-pulse"></span></a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-title">Media</div>
+            <a onclick="switchPage('highlights', this)" class="nav-link"><i class="fa-solid fa-film"></i> Clips <span class="badge-red">HOT</span></a>
         </div>
 
         <div class="nav-group">
             <div class="nav-title">Shop</div>
-            <a onclick="switchPage('shop', this)" class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Shop <span style="background:var(--primary); color:white; font-size:10px; padding:2px 6px; border-radius:4px; margin-left:5px;">New</span></a>
+            <a onclick="switchPage('shop', this)" class="nav-link"><i class="fa-solid fa-cart-shopping"></i> Shop</a>
             <a onclick="switchPage('giftcards', this)" class="nav-link"><i class="fa-solid fa-gift"></i> Gift Cards</a>
         </div>
 
@@ -463,7 +497,6 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
 
-            <!-- BARRE DE RECHERCHE FONCTIONNELLE -->
             <div class="search-bar">
                 <i class="fa-solid fa-magnifying-glass" style="color: #666;"></i>
                 <input type="text" id="match-search-input" placeholder="Search matches (ex: 1v1)...">
@@ -494,8 +527,8 @@
                             Ton match a été créé avec succès. En attente d'un adversaire...
                         </div>
                         <div class="notif-item">
-                            <strong style="color: var(--gold); display: block; margin-bottom: 3px;">Tournoi Spécial</strong>
-                            Les inscriptions pour le tournoi du week-end sont ouvertes !
+                            <strong style="color: var(--danger); display: block; margin-bottom: 3px;">Nouveau Clip !</strong>
+                            Ash vient de poster un headshot à 200m. Va voir dans l'onglet Clips !
                         </div>
                     </div>
                 </div>
@@ -504,10 +537,100 @@
             </div>
         </nav>
 
+        <!-- ==============================================
+             NOUVEL ONGLET : RADAR TACTIQUE (COMMAND CENTER)
+             ============================================== -->
+        <div id="radar" class="page-section">
+            <div class="section-header">
+                <div>
+                    <span class="sub" style="color: var(--success);">LIVE TRACKING SYSTEM</span>
+                    <h3><i class="fa-solid fa-satellite-dish"></i> Command Center</h3>
+                    <p style="color: var(--text-muted); font-size: 14px; margin-top: 5px;">Surveillez l'activité des joueurs du clan en temps réel sur Discord.</p>
+                </div>
+            </div>
+
+            <div class="radar-dashboard">
+                <!-- LE RADAR VISUEL -->
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <div class="radar-box" id="radar-ui">
+                        <div class="radar-grid"></div>
+                        <div class="radar-circles"></div>
+                        <div class="radar-scanner"></div>
+                        <!-- Les points verts apparaitront ici en JS -->
+                    </div>
+                    <div style="margin-top: 30px; display: flex; gap: 20px;">
+                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-circle" style="color: var(--success); font-size: 8px;"></i> En jeu</span>
+                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-circle" style="color: var(--primary); font-size: 8px;"></i> Dans les menus</span>
+                        <span style="font-size: 12px; color: var(--text-muted);"><i class="fa-solid fa-circle" style="color: var(--danger); font-size: 8px;"></i> Ne pas déranger</span>
+                    </div>
+                </div>
+
+                <!-- LE PANNEAU COMMS -->
+                <div class="comms-panel">
+                    <div class="comms-header">
+                        <h4><i class="fa-solid fa-microphone-lines"></i> Live Comms</h4>
+                        <span style="background: rgba(16, 185, 129, 0.2); color: var(--success); font-size: 10px; padding: 2px 8px; border-radius: 4px; border: 1px solid var(--success);">CONNECTED</span>
+                    </div>
+                    <div class="comms-list" id="comms-list">
+                        <!-- Généré en JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==============================================
+             NOUVEL ONGLET : THÉÂTRE DE SANG (TIKTOK HUB)
+             ============================================== -->
+        <div id="highlights" class="page-section" style="padding: 0;">
+            <div class="tiktok-wrapper" id="tiktok-wrapper">
+                <!-- Slide 1 -->
+                <div class="tiktok-slide" style="background-image: url('https://cdn2.unrealengine.com/fortnite-competitive-cash-cups-1920x1080-60b769f3792f.jpg');">
+                    <div class="tiktok-overlay"></div>
+                    <div class="tiktok-ui-right">
+                        <div class="tiktok-btn" onclick="likeClip(this)"><i class="fa-solid fa-heart"></i><span class="count">2.4K</span></div>
+                        <div class="tiktok-btn"><i class="fa-solid fa-comment"></i><span class="count">142</span></div>
+                        <div class="tiktok-btn" onclick="copyCreatorCode()"><i class="fa-solid fa-share"></i><span class="count">Share</span></div>
+                    </div>
+                    <div class="tiktok-info">
+                        <h3><img src="121c09ad-fbff-41ae-b743-deb7acabb65e.jpg" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid var(--primary);"> Ash <i class="fa-solid fa-circle-check" style="color: #3b82f6; font-size: 14px;"></i></h3>
+                        <p>Clutch 1v3 en Cash Cup Finale ! Let's go ! 🔥 #Fortnite #AELIONX #Clutch</p>
+                        <button class="tiktok-challenge-btn" onclick="openCreateMatchFromClip('Ash')"><i class="fa-solid fa-swords"></i> Défier ce joueur</button>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+                <div class="tiktok-slide" style="background-image: url('https://cdn2.unrealengine.com/fortnite-chapter-4-season-2-competitive-update-1920x1080-8b6fa202111c.jpg');">
+                    <div class="tiktok-overlay"></div>
+                    <div class="tiktok-ui-right">
+                        <div class="tiktok-btn" onclick="likeClip(this)"><i class="fa-solid fa-heart"></i><span class="count">856</span></div>
+                        <div class="tiktok-btn"><i class="fa-solid fa-comment"></i><span class="count">24</span></div>
+                        <div class="tiktok-btn" onclick="copyCreatorCode()"><i class="fa-solid fa-share"></i><span class="count">Share</span></div>
+                    </div>
+                    <div class="tiktok-info">
+                        <h3><img src="https://fortnite-api.com/images/cosmetics/br/cid_044_athena_commando_f_scipop/icon.png" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid #9ca3af;"> Emill</h3>
+                        <p>Petit edit rapide en creative 🎯 #Mechanics #ZeroDelay</p>
+                        <button class="tiktok-challenge-btn" onclick="openCreateMatchFromClip('Emill')"><i class="fa-solid fa-swords"></i> Défier ce joueur</button>
+                    </div>
+                </div>
+                <!-- Slide 3 -->
+                <div class="tiktok-slide" style="background-image: url('https://cdn2.unrealengine.com/fortnite-fncs-invitational-2022-1920x1080-cd5cf9571f54.jpg');">
+                    <div class="tiktok-overlay"></div>
+                    <div class="tiktok-ui-right">
+                        <div class="tiktok-btn" onclick="likeClip(this)"><i class="fa-solid fa-heart"></i><span class="count">1.1K</span></div>
+                        <div class="tiktok-btn"><i class="fa-solid fa-comment"></i><span class="count">89</span></div>
+                        <div class="tiktok-btn" onclick="copyCreatorCode()"><i class="fa-solid fa-share"></i><span class="count">Share</span></div>
+                    </div>
+                    <div class="tiktok-info">
+                        <h3><img src="https://fortnite-api.com/images/cosmetics/br/cid_028_athena_commando_f/icon.png" style="width: 35px; height: 35px; border-radius: 50%; border: 2px solid #10b981;"> crazy</h3>
+                        <p>Mon sniper ne rate jamais mdrrrr 😂 #Sniper #FortniteFR</p>
+                        <button class="tiktok-challenge-btn" onclick="openCreateMatchFromClip('crazy')"><i class="fa-solid fa-swords"></i> Défier ce joueur</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="matches" class="page-section active">
             
             <div class="matches-hero">
-                <!-- COMPTEUR LIVE -->
                 <div class="online-badge" id="live-player-badge">
                     <i class="fa-solid fa-circle"></i> <span id="live-player-count">342</span> Players Online
                 </div>
@@ -790,7 +913,6 @@
                 <div class="page-tab" style="flex: 1; text-align: center;" onclick="clickShopTab(this, 'upgrades')">Match Upgrades</div>
             </div>
 
-            <!-- CODE CRÉATEUR BANNER -->
             <div style="background: linear-gradient(135deg, var(--bg-card), var(--bg-sidebar)); border: 1px solid var(--primary); border-radius: 12px; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; box-shadow: 0 0 20px rgba(139, 92, 246, 0.15); flex-wrap: wrap; gap: 15px;">
                 <div>
                     <h4 style="font-size: 20px; color: white; display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
@@ -997,7 +1119,6 @@
                 </div>
             </div>
 
-            <!-- Chat Room -->
             <div class="chat-container" id="chat-box">
                 <div class="chat-bubble system">Match ID #9482 généré.</div>
                 <div class="chat-bubble system" id="wait-msg">En attente d'un adversaire...</div>
@@ -1008,7 +1129,6 @@
                 <button class="btn-apply" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
             </div>
 
-            <!-- Preuve de Résultat -->
             <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
                 <h4 style="font-size: 14px; margin-bottom: 10px; text-transform: uppercase; color: var(--text-muted);">Report Match Result</h4>
                 <div style="display: flex; gap: 10px;" id="result-buttons">
@@ -1090,7 +1210,6 @@
                 <div style="position: absolute; bottom: -5px; right: -5px; background: var(--gold); width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--bg-sidebar); color: black; font-size: 12px;"><i class="fa-solid fa-ranking-star"></i></div>
             </div>
             
-            <!-- Le span profile-name-display permet d'appliquer la couleur/le badge VIP -->
             <h2 style="margin-bottom: 5px;"><span id="profile-name-display">Player Profile</span></h2>
             <p style="color: var(--gold); font-weight: bold; margin-bottom: 15px; font-size: 14px;">GOLD II <span style="color: var(--text-muted); font-size: 12px; font-weight: normal;">(1,240 Elo)</span></p>
             
@@ -1113,7 +1232,6 @@
                 </div>
             </div>
 
-            <!-- ARMURERIE / SETUP PC INJECTÉE ICI -->
             <div style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color); text-align: left; margin-bottom: 25px; position: relative; overflow: hidden;">
                 <div style="position: absolute; top: -10px; right: -10px; font-size: 60px; opacity: 0.05;"><i class="fa-solid fa-microchip"></i></div>
                 <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; font-weight: bold;"><i class="fa-solid fa-server" style="color: var(--primary);"></i> Setup & Hardware</div>
@@ -1207,7 +1325,6 @@
                 <button class="btn-full-gold" id="btn-buy-initial" onclick="openCheckout()">PURCHASE 10 TOKENS</button>
             </div>
 
-            <!-- MODIFICATION RETRAIT: Seuil de 20 et 5% de frais de plateforme -->
             <div id="section-withdraw" style="display: none;">
                 <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 15px;">Withdraw your Tokens to real money via PayPal. Minimum withdrawal is 20 Tokens.</p>
                 
@@ -1271,7 +1388,6 @@
         </div>
     </div>
 
-    <!-- MODALE DE SUCCÈS GLOBALE -->
     <div id="modal-success-msg" class="modal-overlay">
         <div class="modal-content" style="text-align: center; max-width: 380px; padding: 40px 30px;">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-success-msg')"></i>
@@ -1291,7 +1407,6 @@
         </div>
     </div>
 
-    <!-- MODALE D'ERREUR GLOBALE -->
     <div id="modal-error" class="modal-overlay">
         <div class="modal-content" style="text-align: center; max-width: 380px; padding: 40px 30px;">
             <i class="fa-solid fa-xmark modal-close" onclick="closeModal('modal-error')"></i>
@@ -1311,7 +1426,6 @@
         </div>
     </div>
 
-    <!-- SCRIPTS INTERACTIFS -->
     <script>
         let currentBalance = 0.00;
         let selectedTokenAmount = 10;
@@ -1319,13 +1433,11 @@
         let itemToBuyName = "";
         let itemToBuyPrice = 0;
         let currentPrizePool = 0;
-        let itemMeta = null; // Pour sauvegarder la couleur du Neon Flex ou le VIP
+        let itemMeta = null;
 
-        // Variables de profil de flex (Economy virtuelle)
         let isVIP = localStorage.getItem('aelionx_vip') === 'true';
         let myFlexColor = localStorage.getItem('aelionx_flex_color') || '';
 
-        // --- 1. GESTION DU THÈME ---
         const themes = {
             purple: { primary: '#8b5cf6', dark: '#5b21b6', glow: 'rgba(139, 92, 246, 0.4)' },
             green: { primary: '#10b981', dark: '#047857', glow: 'rgba(16, 185, 129, 0.4)' },
@@ -1336,11 +1448,9 @@
 
         function changeTheme(color, element) {
             let t = themes[color];
-            
             document.documentElement.style.setProperty('--primary', t.primary);
             document.documentElement.style.setProperty('--primary-dark', t.dark);
             document.documentElement.style.setProperty('--primary-glow', t.glow);
-            
             localStorage.setItem('aelionx_theme', color);
             
             if(element) {
@@ -1349,7 +1459,6 @@
             }
         }
 
-        // --- APPLIQUER LE FLEX (COULEURS + VIP) ---
         function applyPlayerFlex() {
             let nameElement = document.getElementById('profile-name-display');
             if(!nameElement) return;
@@ -1369,7 +1478,6 @@
             }
         }
 
-        // --- BOT FOMO (LIVE FEED) ---
         function startLiveFeed() {
             const events = [
                 "🚨 <strong>Ash</strong> a remporté <strong>18.00 <i class='fa-solid fa-coins' style='color:var(--gold)'></i></strong> en 1v1 !",
@@ -1394,26 +1502,21 @@
             }, 12000);
         }
 
-        // Fonction globale pour afficher les erreurs joliment avec une croix
         function showError(message) {
             document.getElementById('error-message-text').innerText = message;
             let modal = document.getElementById('modal-error');
             let content = modal.querySelector('.modal-content');
-            
             openModal('modal-error');
-            
             content.classList.remove('error-shake');
             void content.offsetWidth;
             content.classList.add('error-shake');
         }
 
-        // Fonction globale pour afficher les succès joliment avec un check vert
         function showSuccess(message) {
             document.getElementById('success-message-text').innerText = message;
             openModal('modal-success-msg');
         }
 
-        // Chargement initial
         window.onload = async () => {
             if (localStorage.getItem('aelionx_balance')) {
                 currentBalance = parseFloat(localStorage.getItem('aelionx_balance'));
@@ -1427,6 +1530,7 @@
             changeTheme(savedTheme, null);
 
             applyPlayerFlex();
+            initRadarSystem(); // NOUVEAU : Démarrer le radar
 
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('epic_success') === 'true') {
@@ -1481,7 +1585,66 @@
             }
         };
 
-        // --- 4. LOBBY MATCH & CHAT & PROOF ---
+        // --- NOUVEAU : SYSTÈME RADAR ---
+        function initRadarSystem() {
+            let radarUi = document.getElementById('radar-ui');
+            let commsList = document.getElementById('comms-list');
+            
+            // Simuler des points sur le radar
+            setInterval(() => {
+                let dot = document.createElement('div');
+                dot.className = 'radar-dot active';
+                dot.style.left = Math.random() * 80 + 10 + '%';
+                dot.style.top = Math.random() * 80 + 10 + '%';
+                radarUi.appendChild(dot);
+                setTimeout(() => dot.remove(), 3000);
+            }, 2500);
+
+            // Simuler des joueurs en vocal (Comms Live)
+            const players = [
+                {name: "Ash", action: "Recherche un adversaire", status: "online", img: "121c09ad-fbff-41ae-b743-deb7acabb65e.jpg"},
+                {name: "Emill", action: "En Match (Zone Wars)", status: "dnd", img: "https://fortnite-api.com/images/cosmetics/br/cid_044_athena_commando_f_scipop/icon.png"},
+                {name: "wolvax", action: "Dans le salon (AFK)", status: "dnd", img: "https://fortnite-api.com/images/cosmetics/br/cid_030_athena_commando_m_halloween/icon.png"},
+                {name: "crazy", action: "Mode Créatif (Aim Train)", status: "online", img: "https://fortnite-api.com/images/cosmetics/br/cid_028_athena_commando_f/icon.png"}
+            ];
+
+            players.forEach(p => {
+                commsList.innerHTML += `
+                    <div class="comm-item">
+                        <div class="comm-avatar">
+                            <img src="${p.img}">
+                            <div class="status ${p.status}"></div>
+                        </div>
+                        <div class="comm-info">
+                            <h5>${p.name}</h5>
+                            <p>${p.status === 'online' ? '<i class="fa-solid fa-microphone"></i>' : '<i class="fa-solid fa-microphone-slash"></i>'} ${p.action}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- NOUVEAU : ACTIONS TIKTOK CLIPS ---
+        function likeClip(btn) {
+            let icon = btn.querySelector('i');
+            let countSpan = btn.querySelector('.count');
+            if(icon.style.color === 'var(--danger)') {
+                icon.style.color = 'white';
+                btn.style.borderColor = 'rgba(255,255,255,0.1)';
+            } else {
+                icon.style.color = 'var(--danger)';
+                btn.style.borderColor = 'var(--danger)';
+            }
+        }
+
+        function openCreateMatchFromClip(targetName) {
+            switchPage('matches', document.querySelector('.nav-link:nth-child(2)'));
+            openModal('modal-create-match');
+            setTimeout(() => {
+                showSuccess(`Vous allez défier ${targetName}. Paramétrez votre match !`);
+            }, 500);
+        }
+
         function openMatchLobby(fee, prize) {
             currentPrizePool = prize;
             document.getElementById('lobby-match-prize').innerText = prize.toFixed(2);
@@ -1538,19 +1701,16 @@
             showError("Défaite enregistrée. Entraîne-toi et reviens plus fort !");
         }
 
-        // --- NOUVELLE FONCTION COPIER LE CODE CRÉATEUR ---
         function copyCreatorCode() {
             navigator.clipboard.writeText("AELIONX");
             showSuccess("Code AELIONX copié dans le presse-papier ! Merci du soutien 💜");
         }
 
-        // --- GESTION DU MENU MOBILE ---
         function toggleSidebar() {
             document.querySelector('.sidebar').classList.toggle('active');
             document.querySelector('.sidebar-overlay').classList.toggle('active');
         }
 
-        // --- GESTION ACHAT / RETRAIT ---
         function switchFinanceTab(tab) {
             let btnPurchase = document.getElementById('tab-btn-purchase');
             let btnWithdraw = document.getElementById('tab-btn-withdraw');
@@ -1578,7 +1738,7 @@
 
         function calculateWithdrawFee() {
             let val = parseFloat(document.getElementById('withdraw-amount-input').value) || 0;
-            let fee = val * 0.05; // 5% de frais de plateforme
+            let fee = val * 0.05; 
             let receive = val - fee;
             document.getElementById('withdraw-fee-text').innerText = `-${fee.toFixed(2)}`;
             document.getElementById('withdraw-receive-text').innerText = `${receive.toFixed(2)} €`;
@@ -1590,18 +1750,13 @@
             let btn = document.getElementById('btn-withdraw-action');
 
             if (!amountInput || !emailInput) {
-                showError("Veuillez remplir tous les champs.");
-                return;
+                showError("Veuillez remplir tous les champs."); return;
             }
-
             if (parseFloat(amountInput) < 20) {
-                showError("Le montant minimum de retrait est de 20 Tokens.");
-                return;
+                showError("Le montant minimum de retrait est de 20 Tokens."); return;
             }
-
             if (parseFloat(amountInput) > currentBalance) {
-                showError("Solde insuffisant pour effectuer ce retrait.");
-                return;
+                showError("Solde insuffisant pour effectuer ce retrait."); return;
             }
 
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Traitement...';
@@ -1632,7 +1787,6 @@
                     showError(data.error || "Impossible de traiter la demande.");
                 }
             } catch (error) {
-                // Simulation pour le visuel front-end s'il n'y a pas de backend
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> Succès !';
                 currentBalance -= parseFloat(amountInput);
                 localStorage.setItem('aelionx_balance', currentBalance);
@@ -1646,12 +1800,7 @@
             }
         }
 
-        // --- FILTRES & TRI ---
-        let activeFilters = {
-            region: 'all',
-            platform: 'all',
-            gamemode: 'all'
-        };
+        let activeFilters = { region: 'all', platform: 'all', gamemode: 'all' };
 
         function toggleDropdown(dropdownId) {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
@@ -1669,7 +1818,6 @@
 
         function filterMatches(type, value, labelText) {
             activeFilters[type] = value;
-            
             if(type === 'region') document.getElementById('selected-region').innerText = labelText;
             if(type === 'platform') document.getElementById('selected-platform').innerText = labelText;
             if(type === 'gamemode') document.getElementById('selected-gamemode').innerText = labelText;
@@ -1683,7 +1831,6 @@
 
         function sortMatches(sortType, labelText) {
             document.getElementById('selected-sort').innerText = labelText;
-            
             event.target.parentElement.querySelectorAll('.dropdown-item').forEach(item => item.classList.remove('selected'));
             event.target.classList.add('selected');
             event.target.parentElement.classList.remove('show');
@@ -1700,11 +1847,7 @@
                 let pMatch = (activeFilters.platform === 'all' || card.dataset.platform === activeFilters.platform);
                 let gMatch = (activeFilters.gamemode === 'all' || card.dataset.gamemode === activeFilters.gamemode);
 
-                if (rMatch && pMatch && gMatch) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
+                if (rMatch && pMatch && gMatch) { card.style.display = 'block'; } else { card.style.display = 'none'; }
             });
 
             cards.sort((a, b) => {
@@ -1735,7 +1878,6 @@
             applyFilteringAndSorting('newest');
         }
 
-        // --- AUTRES FONCTIONS INTERACTIVES ---
         function updateAllBalances() {
             document.querySelectorAll('.token-balance-text').forEach(display => {
                 display.innerText = currentBalance.toFixed(2);
@@ -1780,7 +1922,7 @@
         function promptPurchase(itemName, price, meta = null) {
             itemToBuyName = itemName;
             itemToBuyPrice = parseFloat(price);
-            itemMeta = meta; // Sauvegarde de la couleur Neon ou du tag VIP
+            itemMeta = meta; 
             document.getElementById('confirm-item-name').innerText = itemName;
             document.getElementById('confirm-item-price').innerText = price.toFixed(2) + " Tokens";
             
@@ -1861,7 +2003,6 @@
             openModal('modal-purchase');
         }
 
-        // Redirige directement vers la vraie route de connexion officielle Epic Games de ton app.py
         function linkEpicAccount() {
             window.location.href = '/login/epic';
         }
@@ -1887,7 +2028,6 @@
                     btn.style.pointerEvents = "auto";
                 }
             } catch (error) {
-                // Simulation en cas d'absence de backend
                 setTimeout(() => {
                     currentBalance += selectedTokenAmount;
                     localStorage.setItem('aelionx_balance', currentBalance);
@@ -1945,7 +2085,6 @@
                 }
                 applyFilteringAndSorting('newest');
             } catch (e) {
-                // Simulation s'il n'y a pas de backend
                 let container = document.getElementById('dynamic-matches-container');
                 container.innerHTML = '';
                 
@@ -2003,7 +2142,6 @@
                     showError(data.error || 'Impossible de créer le match');
                 }
             } catch (e) {
-                // Simulation si pas de backend
                 if (fee > currentBalance) {
                     showError('Solde insuffisant pour créer ce match.'); return;
                 }
@@ -2067,7 +2205,6 @@
                     }, 1200);
                 }
             } catch(e) {
-                // Simulation si pas de backend
                 setTimeout(() => {
                     if (currentBalance >= fee) {
                         currentBalance -= fee;
