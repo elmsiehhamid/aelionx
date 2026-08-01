@@ -7,8 +7,9 @@
     }
   ],
   "routes": [
-    { "src": "/api/(.*)", "dest": "app.py" },
-    { "src": "/pay/(.*)", "dest": "app.py" },
-    { "src": "/login/(.*)", "dest": "app.py" }
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
   ]
 }
