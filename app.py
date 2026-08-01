@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, request, redirect, session, jsonify, send_from_directory
 import sqlite3
 import requests
@@ -7,15 +8,14 @@ app = Flask(__name__, template_folder='.') # Cherche index.html dans le même do
 app.secret_key = "9664c42e441bbd49bdc5ac31dc550bead16d49bffb395e5e185e2f72085a638d"
 
 # ================= CONFIGURATION =================
-# Ton vrai nom de domaine en ligne
 DOMAIN_URL = "https://aelionx.com" 
 
-# 1. DISCORD OAUTH2 (Connexion des joueurs)
+# 1. DISCORD OAUTH2
 DISCORD_CLIENT_ID = "1531436256129450124"
 DISCORD_CLIENT_SECRET = "0gJTf_NObmpCY6aaCnptq6RnDO8uuK7t3"
 DISCORD_REDIRECT_URI = f"{DOMAIN_URL}/callback"
 
-# 2. PAYPAL API (Passe en "https://api-m.paypal.com" avec tes clés Live pour l'argent réel)
+# 2. PAYPAL API
 PAYPAL_CLIENT_ID = "AZnJoA4KhCvofBX4gnAEoszq7U8WMPZaFCvuxNBP0f6iEWKhBT19d71tewTNJ4mZhsBjkGtWuBSV5n0G"
 PAYPAL_SECRET = "EF5L9PIRmbiP2QkwmXQOfj5js4hE52zPCPdCUXf0mXFA43rgIo10ahOhQ-qcNPNU4ejsQRgF8uEJiH5i"
 PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com" # Remplace par https://api-m.paypal.com pour le mode réel
@@ -89,19 +89,29 @@ def callback():
     return redirect('/')
 
 # --- 2. LIAISON EPIC GAMES ---
-@app.route('/link/epic', methods=['POST'])
-@app.route('/api/link/epic', methods=['POST'])
-@app.route('/link-epic', methods=['POST'])
+@app.route('/link/epic', methods=['POST', 'GET'])
+@app.route('/api/link/epic', methods=['POST', 'GET'])
+@app.route('/link-epic', methods=['POST', 'GET'])
 def link_epic():
     try:
         if 'user_id' not in session:
-            return jsonify({"error": "Non connecté à Discord"}), 403
+            if request.is_json:
+                return jsonify({"error": "Non connecté à Discord"}), 403
+            return redirect('/login')
 
-        req_data = request.get_json(silent=True) or {}
-        epic_id = req_data.get('epic_id')
-        
+        epic_id = None
+        if request.is_json:
+            req_data = request.get_json(silent=True) or {}
+            epic_id = req_data.get('epic_id')
+        elif request.method == 'POST':
+            epic_id = request.form.get('epic_id')
+        else:
+            epic_id = request.args.get('epic_id')
+            
         if not epic_id:
-            return jsonify({"error": "Pseudo Epic manquant"}), 400
+            if request.is_json:
+                return jsonify({"error": "Pseudo Epic manquant"}), 400
+            return redirect('/')
             
         user_id = session['user_id']
         get_user(user_id)
@@ -112,9 +122,13 @@ def link_epic():
         conn.commit()
         conn.close()
         
-        return jsonify({"success": True, "message": f"Compte Epic {epic_id} lié avec succès !"})
+        if request.is_json:
+            return jsonify({"success": True, "message": f"Compte Epic {epic_id} lié avec succès !"})
+        return redirect('/')
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        if request.is_json:
+            return jsonify({"error": str(e)}), 500
+        return str(e), 500
 
 # --- 3. PAIEMENT PAYPAL ---
 def get_paypal_token():
@@ -126,14 +140,20 @@ def get_paypal_token():
         raise Exception(f"Erreur d'authentification PayPal : {res_json}")
     return res_json['access_token']
 
-@app.route('/pay/create', methods=['POST'])
+@app.route('/pay/create', methods=['GET', 'POST'])
 def create_payment():
     try:
         if 'user_id' not in session:
-            return jsonify({"error": "Non connecté à Discord"}), 403
+            return redirect('/login')
 
-        req_data = request.get_json(silent=True) or {}
-        amount = req_data.get('amount', 10.0)
+        amount = 10.0
+        if request.is_json:
+            req_data = request.get_json(silent=True) or {}
+            amount = float(req_data.get('amount', 10.0))
+        elif request.method == 'POST':
+            amount = float(request.form.get('amount', 10.0))
+        else:
+            amount = float(request.args.get('amount', 10.0))
         
         token = get_paypal_token()
         
@@ -146,7 +166,7 @@ def create_payment():
             "intent": "CAPTURE",
             "purchase_units": [{
                 "amount": {"currency_code": "USD", "value": str(amount)},
-                "description": f"{amount} Tokens ÆLIONX pour {session['username']}"
+                "description": f"{amount} Tokens ÆLIONX pour {session.get('username', 'Joueur')}"
             }],
             "application_context": {
                 "return_url": f"{DOMAIN_URL}/pay/success",
@@ -159,7 +179,11 @@ def create_payment():
         
         for link in order.get('links', []):
             if link['rel'] == "approve":
-                return jsonify({"payment_url": link['href']})
+                # Si c'est une requête API/Fetch, on renvoie du JSON. Sinon, on redirige directement le navigateur !
+                if request.is_json:
+                    return jsonify({"payment_url": link['href']})
+                else:
+                    return redirect(link['href'])
                 
         return jsonify({"error": "Erreur PayPal", "details": order}), 500
 
@@ -196,4 +220,5 @@ def cancel_payment():
 
 if __name__ == '__main__':
     init_db()
-    app.run(port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
