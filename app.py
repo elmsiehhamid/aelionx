@@ -4,7 +4,7 @@ import sqlite3
 import requests
 import base64
 
-app = Flask(__name__, template_folder='.') # Cherche index.html dans le même dossier
+app = Flask(__name__, template_folder='.')
 app.secret_key = "9664c42e441bbd49bdc5ac31dc550bead16d49bffb395e5e185e2f72085a638d"
 
 # ================= CONFIGURATION =================
@@ -18,7 +18,7 @@ DISCORD_REDIRECT_URI = f"{DOMAIN_URL}/callback"
 # 2. PAYPAL API
 PAYPAL_CLIENT_ID = "AZnJoA4KhCvofBX4gnAEoszq7U8WMPZaFCvuxNBP0f6iEWKhBT19d71tewTNJ4mZhsBjkGtWuBSV5n0G"
 PAYPAL_SECRET = "EF5L9PIRmbiP2QkwmXQOfj5js4hE52zPCPdCUXf0mXFA43rgIo10ahOhQ-qcNPNU4ejsQRgF8uEJiH5i"
-PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com" # Remplace par https://api-m.paypal.com pour le mode réel
+PAYPAL_API_BASE = "https://api-m.sandbox.paypal.com" # Change vers api-m.paypal.com pour la production réelle
 
 # ================= BASE DE DONNÉES =================
 def init_db():
@@ -89,29 +89,19 @@ def callback():
     return redirect('/')
 
 # --- 2. LIAISON EPIC GAMES ---
-@app.route('/link/epic', methods=['POST', 'GET'])
-@app.route('/api/link/epic', methods=['POST', 'GET'])
-@app.route('/link-epic', methods=['POST', 'GET'])
+@app.route('/link/epic', methods=['POST'])
+@app.route('/api/link/epic', methods=['POST'])
+@app.route('/link-epic', methods=['POST'])
 def link_epic():
     try:
         if 'user_id' not in session:
-            if request.is_json:
-                return jsonify({"error": "Non connecté à Discord"}), 403
-            return redirect('/login')
+            return jsonify({"error": "Non connecté à Discord"}), 403
 
-        epic_id = None
-        if request.is_json:
-            req_data = request.get_json(silent=True) or {}
-            epic_id = req_data.get('epic_id')
-        elif request.method == 'POST':
-            epic_id = request.form.get('epic_id')
-        else:
-            epic_id = request.args.get('epic_id')
-            
+        req_data = request.get_json(silent=True) or {}
+        epic_id = req_data.get('epic_id')
+        
         if not epic_id:
-            if request.is_json:
-                return jsonify({"error": "Pseudo Epic manquant"}), 400
-            return redirect('/')
+            return jsonify({"error": "Pseudo Epic manquant"}), 400
             
         user_id = session['user_id']
         get_user(user_id)
@@ -122,13 +112,9 @@ def link_epic():
         conn.commit()
         conn.close()
         
-        if request.is_json:
-            return jsonify({"success": True, "message": f"Compte Epic {epic_id} lié avec succès !"})
-        return redirect('/')
+        return jsonify({"success": True, "message": f"Compte Epic {epic_id} lié avec succès !"})
     except Exception as e:
-        if request.is_json:
-            return jsonify({"error": str(e)}), 500
-        return str(e), 500
+        return jsonify({"error": str(e)}), 500
 
 # --- 3. PAIEMENT PAYPAL ---
 def get_paypal_token():
@@ -140,20 +126,14 @@ def get_paypal_token():
         raise Exception(f"Erreur d'authentification PayPal : {res_json}")
     return res_json['access_token']
 
-@app.route('/pay/create', methods=['GET', 'POST'])
+@app.route('/pay/create', methods=['POST'])
 def create_payment():
     try:
         if 'user_id' not in session:
-            return redirect('/login')
+            return jsonify({"error": "Non connecté à Discord"}), 403
 
-        amount = 10.0
-        if request.is_json:
-            req_data = request.get_json(silent=True) or {}
-            amount = float(req_data.get('amount', 10.0))
-        elif request.method == 'POST':
-            amount = float(request.form.get('amount', 10.0))
-        else:
-            amount = float(request.args.get('amount', 10.0))
+        req_data = request.get_json(silent=True) or {}
+        amount = req_data.get('amount', 10.0)
         
         token = get_paypal_token()
         
@@ -179,11 +159,7 @@ def create_payment():
         
         for link in order.get('links', []):
             if link['rel'] == "approve":
-                # Si c'est une requête API/Fetch, on renvoie du JSON. Sinon, on redirige directement le navigateur !
-                if request.is_json:
-                    return jsonify({"payment_url": link['href']})
-                else:
-                    return redirect(link['href'])
+                return jsonify({"payment_url": link['href']})
                 
         return jsonify({"error": "Erreur PayPal", "details": order}), 500
 
@@ -200,7 +176,7 @@ def execute_payment():
         "Authorization": f"Bearer {access_token}"
     }
     
-    r = requests.post(f"{PAYPAL_API_BASE}/v2/checkout/orders/{token}/capture", headers=headers)
+    r = requests.post(f"{PAYPAY_API_BASE if 'PAYPAY_API_BASE' in globals() else PAYPAL_API_BASE}/v2/checkout/orders/{token}/capture", headers=headers)
     result = r.json()
     
     if result.get('status') == 'COMPLETED':
